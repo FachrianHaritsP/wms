@@ -1,51 +1,81 @@
-function stockIn(){
+function resetCard(){
 
-    let product_id = document.getElementById('product_id').value
-    let qty = document.getElementById('qty').value
+    document.getElementById('product_sku').innerText = '';
+    document.getElementById('product_size').innerText = '';
+    document.getElementById('product_color').innerText = '';
+    document.getElementById('product_stock').innerText = '';
+    document.getElementById('product_location').innerText = '';
 
-    fetch('/warehouse/stock-in', { //fetch('/api/warehouse/stock-in'
+}
 
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-        },
+function clearForm(){
 
-        body: JSON.stringify({
-            product_id: product_id,
-            qty: qty
-        })
+    document.getElementById('product_id').value = '';
+    document.getElementById('qty').value = '';
 
-    })
+}
+
+function fillProductCard(product){
+
+    document.getElementById('product_sku').innerText = product.sku;
+    document.getElementById('product_size').innerText = product.size;
+    document.getElementById('product_color').innerText = product.color;
+    document.getElementById('product_stock').innerText = product.stock;
+
+    document.getElementById('product_location').innerText =
+        product.rack_slot
+        ? product.rack_slot.rack.rack_code + ' - ' + product.rack_slot.slot_code
+        : '-';
+
+}
+
+function resetAfterTransaction(){
+
+    clearForm();
+    resetCard();
+
+}
+
+function handleScan(sku){
+
+    clearForm();
+    resetCard();
+
+    fetch('/api/warehouse/scan/' + sku)
+
     .then(res => res.json())
-    .then(() => {
 
-        loadHistory()
-         // reset form
-        document.getElementById('product_id').value = ''
-        document.getElementById('qty').value = ''
-        document.getElementById('product_sku').innerText = '';
+    .then(response => {
 
-        document.getElementById('product_size').innerText = '';
+        let product = response.data;
 
-        document.getElementById('product_color').innerText = '';
+        if(product){
 
-        document.getElementById('product_stock').innerText = '';
+            document.getElementById('product_id').value = product.id;
 
-        document.getElementById('product_location').innerText = '';
+            fillProductCard(product);
+
+        } else {
+
+            resetCard();
+
+            alert('Produk tidak ditemukan');
+
+        }
 
     })
 
 }
 
-function stockOut(){
+function stockIn(){
 
-    let product_id = document.getElementById('product_id').value
-    let qty = document.getElementById('qty').value
+    let product_id = document.getElementById('product_id').value;
+    let qty = document.getElementById('qty').value;
 
-    fetch('/warehouse/stock-out', { // fetch('/api/warehouse/stock-out'
+    fetch('/api/warehouse/stock-in', {
 
         method: 'POST',
+
         headers: {
             'Content-Type': 'application/json',
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
@@ -57,25 +87,50 @@ function stockOut(){
         })
 
     })
+
     .then(res => res.json())
+
     .then(() => {
 
-        loadHistory()
-         // reset form
-        document.getElementById('product_id').value = ''
-        document.getElementById('qty').value = ''
-        document.getElementById('product_sku').innerText = '';
+        loadHistory();
 
-        document.getElementById('product_size').innerText = '';
+        resetAfterTransaction();
 
-        document.getElementById('product_color').innerText = '';
+    });
 
-        document.getElementById('product_stock').innerText = '';
+}
 
-        document.getElementById('product_location').innerText = '';
+function stockOut(){
+
+    let product_id = document.getElementById('product_id').value;
+    let qty = document.getElementById('qty').value;
+
+    fetch('/warehouse/stock-out', {
+
+        method: 'POST',
+
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        },
+
+        body: JSON.stringify({
+            product_id: product_id,
+            qty: qty
+        })
 
     })
-    
+
+    .then(res => res.json())
+
+    .then(() => {
+
+        loadHistory();
+
+        resetAfterTransaction();
+
+    });
+
 }
 
 function loadProducts(){
@@ -112,14 +167,16 @@ function loadHistory(){
         let table = document.getElementById('history_table')
         table.innerHTML = ''
 
-        data.forEach(item => {
+        //bawaan item.created_at
+        data.data.forEach(item => {
 
             table.innerHTML += `
             <tr>
                 <td>${item.product.name}</td>
                 <td>${item.type}</td>
                 <td>${item.qty}</td>
-                <td>${item.created_at}</td>
+                <td>${new Date(item.created_at).toLocaleString('id-ID')}</td> 
+                <td>${item.user.name}</td>
             </tr>
             `
         })
@@ -149,48 +206,6 @@ function startScanner(){
 
         }
     )
-}
-
-function handleScan(sku){
-
-    document.getElementById('product_id').value = '';
-    document.getElementById('product_sku').value = '';
-    document.getElementById('product_size').value = '';
-    document.getElementById('product_color').value = '';
-    document.getElementById('product_stock').value = '';
-    document.getElementById('product_location').value = '';
-    document.getElementById('qty').value = ''; //biar kosong tiap scan
-
-
-    fetch('/api/warehouse/scan/' + sku) ///api/warehouse/products?search=
-
-    .then(res => res.json())
-
-    .then(response => {
-
-        let product = response.data;// let product = data.find(p => p.sku === sku); // masuk bnyk prdk
-
-        if(product){
-
-            document.getElementById('product_id').value = product.id;
-            document.getElementById('product_sku').innerText = product.sku;
-            document.getElementById('product_size').innerText = product.size;
-            document.getElementById('product_color').innerText = product.color;
-            document.getElementById('product_stock').innerText = product.stock;
-            document.getElementById('product_location').innerText = product.rack_slot 
-            ? product.rack_slot.rack.rack_code + ' - ' + product.rack_slot.slot_code
-            : ' - ';
-
-            console.log(response);
-
-        } else {
-
-            alert("Produk tidak ditemukan");
-
-        }
-
-    })
-
 }
 
 loadProducts()

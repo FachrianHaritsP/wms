@@ -17,4 +17,16 @@ class ReturnItem extends Model
     'created_by',
     'notes',
     ];
+
+    public function product()
+{
+    return $this->belongsTo(Product::class);
+}
+
+public function user()
+{
+    return $this->belongsTo(User::class,'created_by');
+}
+
+
 }

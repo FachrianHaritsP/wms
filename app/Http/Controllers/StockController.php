@@ -7,7 +7,6 @@ use App\Models\Product;
 use App\Models\StockTransaction;
 use App\Models\ActivityLog;
 use Illuminate\Support\Facades\Auth;
-
 use function Laravel\Prompts\alert;
 
 class StockController extends Controller
@@ -21,15 +20,6 @@ class StockController extends Controller
             'product_id' => 'required|exists:products,id',
             'qty' => 'required|integer|min:1'
         ]);
-
-        if($request->qty <= 0){
-
-            alert('Perhatikan jumlah barang');
-            return response()->json([
-                'success' => false,
-                'message' => 'Qty must be greater than 0'
-            ],400);
-        }
 
         if(!$product){
            /*  return response()->json([
@@ -47,7 +37,8 @@ class StockController extends Controller
         StockTransaction::create([
             'product_id' => $product->id,
             'type' => 'in',
-            'qty' => $request->qty
+            'qty' => $request->qty,
+            'created_by' => Auth::id()
         ]);
 
         ActivityLog::create([
@@ -59,7 +50,7 @@ class StockController extends Controller
         return response()->json([
             'success' => true,
             'message'=>'Stock added',
-            'data'=>$product
+            'data'=> $product
         ]);
     }//end stockin
 
@@ -72,13 +63,6 @@ class StockController extends Controller
             'product_id' => 'required|exists:products,id',
             'qty' => 'required|integer|min:1'
         ]);
-
-        if($request->qty <= 0){
-            return response()->json([
-                'success' => false,
-                'message' => 'Qty must be greater than 0'
-            ],400);
-        }
 
 
         if(!$product){
@@ -121,9 +105,10 @@ class StockController extends Controller
 
     function history()
     {
-         $transactions = StockTransaction::with('product')
+         $transactions = StockTransaction::with('product','user')
                     ->latest()
-                    ->get();
+                    ->paginate(10);
+                    //->get();
 
         return response()->json([
             'success'=>true,

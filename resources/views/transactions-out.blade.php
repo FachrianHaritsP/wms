@@ -29,11 +29,14 @@
 
 <p>Color : <span id="product_color"></span></p>
 
-<p>Stock : <span id="product_stock"></span></p>
-
 <p>Location : <span id="product_location"></span></p>
 
-<input type="number" id="qty" class="form-control mb-2" placeholder="Qty">
+<p>Stock : <span id="product_stock"></span></p>
+
+<div class="mt-6">
+    <label>Jumlah barang</label>
+    <input type="number" id="qty" class="form-control mb-2" placeholder="Qty">
+</div>
 
 <button class="btn btn-danger w-100" onclick="stockOut()">Stock Out</button>
 
@@ -56,6 +59,7 @@
 <th>Type</th>
 <th>Qty</th>
 <th>Date</th>
+<th>user</th>
 </tr>
 </thead>
 

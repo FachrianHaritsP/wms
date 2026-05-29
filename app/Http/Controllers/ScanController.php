@@ -13,6 +13,16 @@ class ScanController extends Controller
 
     public function scan($sku) #Request $request
     {
+
+         if(empty($sku)){
+
+            return response()->json([
+                'success' => false,
+                'message' => 'SKU is required'
+            ],400);
+
+        }
+
         #$product = Product::where('sku',$request->sku)->first(); work cuma belum komplit
         $product = Product::with('rackSlot.rack')
                 ->where('sku', $sku) #$request->sku
@@ -29,10 +39,11 @@ class ScanController extends Controller
         return response()->json([
             'success' => true,
             'message'=>'Scan Success',  
-            'data'=>$product
+            'data'=> $product
         ]);
     }
 
+    
 
   public function generate($sku)
     {

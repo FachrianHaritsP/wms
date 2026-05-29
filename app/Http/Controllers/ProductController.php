@@ -5,20 +5,19 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\RackSlot;
-use Illuminate\Support\Facades\Validator;
 
 class ProductController extends Controller
 {
     public function index(Request $request)
     {
-    $query = Product::query();
+        $query = Product::query();
 
-    if($request->search){
-        $query->where(function($q) use ($request){
-        $q->where('sku','like','%'.$request->search.'%')
-        ->orWhere('name','like','%'.$request->search.'%');
-        });
-    }
+        if($request->search){
+            $query->where(function($q) use ($request){
+            $q->where('sku','like','%'.$request->search.'%')
+            ->orWhere('name','like','%'.$request->search.'%');
+            });
+        }   
 
         if($request->size){
             $query->where('size', $request->size);
@@ -28,10 +27,12 @@ class ProductController extends Controller
             $query->where('color', $request->color);
         }
     
-    //$product = $query->get(); work bawaan
-         $products = Product::with('rackSlot.rack')->get();
+        //$product = $query->get(); work bawaan
+        $products = $query->with('rackSlot.rack')->get();
+        //$products = Product::with('rackSlot.rack')->get(); bug search tidak jalan klo pake ini
 
-    //return response()->json($products);//$query->get()
+
+        //return response()->json($products);//$query->get()
         return response()->json([
             'success' => true,
             'message' => 'Product fetched',
@@ -39,7 +40,35 @@ class ProductController extends Controller
         ]);
     }//end
 
+
     public function store(Request $request)
+    {
+        $request->validate([
+            'sku' => 'required|unique:products,sku',
+            'name' => 'required',
+            'size' => 'required',
+            'color' => 'required',
+            'stock' => 'required|integer|min:0',
+            'rack_slot_id' => 'nullable|exists:rack_slots,id'
+        ]);
+
+        $product = Product::create([
+            'sku' => $request->sku,
+            'name' => $request->name,
+            'size' => $request->size,
+            'color' => $request->color,
+            'stock' => $request->stock,
+            'rack_slot_id' => $request->rack_slot_id
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Product created',
+            'data' => $product
+        ]);
+    }
+
+  /*   public function store(Request $request)
     {    
         
         $validator = Validator::make($request->all(),[
@@ -76,7 +105,7 @@ class ProductController extends Controller
             'data' => $product
         ]);
 
-    }//end
+    }//end */
 
     public function show($id)
     {

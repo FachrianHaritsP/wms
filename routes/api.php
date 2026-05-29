@@ -7,12 +7,17 @@ use App\Http\Controllers\StockController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ReturnController;
+use Illuminate\Support\Facades\auth;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-Route::prefix('warehouse')->group(function(){
+/* middleware('auth:sanctum')
+    ->prefix('warehouse')
+    ->group(function () */
+Route::prefix('warehouse')->group(function(){ 
+
     Route::get('/products',[ProductController::class, 'index']);
     Route::post('/products',[ProductController::class, 'store']);
     Route::get('/products/{id}', [ProductController::class, 'show']);
@@ -28,7 +33,7 @@ Route::prefix('warehouse')->group(function(){
     
     Route::get('/dashboard', [DashboardController::class, 'index']);
 
-    Route::post('/returns', [ReturnController::class, 'store']);
+    //Route::post('/returns', [ReturnController::class, 'store']);
 
    
 });

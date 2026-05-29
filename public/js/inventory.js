@@ -1,4 +1,4 @@
-function loadProducts(search = ''){
+/* function loadProducts(search = ''){
 
     let table = document.getElementById('product_table')
     table.innerHTML = '<tr><td colspan="6" class="text-center">Loading...</td></tr>'
@@ -8,6 +8,7 @@ function loadProducts(search = ''){
     .then(response => {
         let data =response.data;
         console.log(data)
+
         table.innerHTML = ''
 
         data.forEach(item => {
@@ -35,12 +36,20 @@ function loadProducts(search = ''){
                     <button class="btn btn-danger btn-sm" onclick="openDeleteModal(${item.id})"> 🗑 Delete</button>
                 </td>
                 <td id="qr-${item.id}"></td>
+            </tr>
             `
         
         fetch('/qr/' + encodeURIComponent(item.sku))
         .then(res => res.text())
         .then(svg => {
-        document.getElementById('qr-' + item.id).innerHTML = svg
+
+            let qrEl = document.getElementById('qr-' + item.id);
+            console.log(item)
+            console.log(item.id) 
+            if(qrEl){
+                qrEl.innerHTML = svg;
+            } 
+            //document.getElementById('qr-' + item.id).innerHTML = svg
         })
             
         })//end data
@@ -51,11 +60,99 @@ function loadProducts(search = ''){
 
 
     })//end fetch
-}//end func
+}//end func */
 
-                // <td>
-                //     <img src="/qr/${encodeURIComponent(item.sku)}" width="60">
-                // </td>
+function loadProducts(search = ''){
+
+    let table = document.getElementById('product_table');
+
+    table.innerHTML =
+    '<tr><td colspan="8" class="text-center">Loading...</td></tr>';
+
+    fetch('/api/warehouse/products?search=' + search)
+
+    .then(res => res.json())
+
+    .then(response => {
+
+        let data = response.data;
+
+        table.innerHTML = '';
+
+        data.forEach(item => {
+
+            let stockClass =
+            item.stock <= 5 ? 'table-danger' : '';
+
+            table.innerHTML += `
+            <tr class="${stockClass}">
+
+                <td>${item.sku}</td>
+
+                <td>${item.name}</td>
+
+                <td>${item.size}</td>
+
+                <td>${item.color}</td>
+
+                <td>
+                    ${item.stock <= 5
+                    ? `<span class="badge bg-danger">${item.stock}</span>`
+                    : item.stock}
+                </td>
+
+                <td>
+                    ${item.rack_slot
+                    ? item.rack_slot.rack.rack_code + '-' + item.rack_slot.slot_code
+                    : '-'}
+                </td>
+
+                <td>
+                    <button class="btn btn-warning btn-sm"
+                    onclick="openEditModal(${item.id})">
+                    ✏ Edit
+                    </button>
+
+                    <button class="btn btn-danger btn-sm"
+                    onclick="openDeleteModal(${item.id})">
+                    🗑 Delete
+                    </button>
+                </td>
+
+                <td id="qr-${item.id}"></td>
+
+            </tr>
+            `;
+
+        });
+
+        data.forEach(item => {
+
+            fetch('/qr/' + encodeURIComponent(item.sku))
+
+            .then(res => res.text())
+
+            .then(svg => {
+
+                let qrEl =
+                document.getElementById('qr-' + item.id);
+
+                if(qrEl){
+                    qrEl.innerHTML = svg;
+                }
+
+            });
+
+        });
+
+        if(data.length === 0){
+            table.innerHTML = '<tr><td colspan="6">No data found</td></tr>';
+        } 
+
+    });
+
+    
+}
 
 function openAddModal(){
 
@@ -150,63 +247,3 @@ document.addEventListener('DOMContentLoaded', function(){
     })
 
 })
-
-/*  Fungsi yang pake prompt 
-
-    function addProduct(){
-
-    let sku = prompt("SKU?")
-    let name = prompt("Name?")
-    let size = prompt("Size?")
-    let color = prompt("Color?")
-    let stock = prompt("Stock?")
-
-    fetch('/api/warehouse/products',{
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            sku,name,size,color,stock
-        })
-    })
-    .then(res => res.json())
-    .then(() => loadProducts())
-
-}//end func
-
-function editProduct(id){
-    
-    let sku = prompt("SKU?")
-    let name = prompt("Name?")
-    let size = prompt("Size?")
-    let color = prompt("Color?")
-    let stock = prompt("Stock?")
-
-    fetch('/api/warehouse/products/' + id, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            sku,name,size,color,stock
-        })
-    })
-    .then(res => res.json())
-    .then(() => loadProducts())
-
-}//end func 
-
-function deleteProduct(id){
-    if(!confirm("Yakin hapus?")) return
-    fetch('/api/warehouse/products/'+id,{
-        method: 'DELETE'
-    })
-    .then(res => res.json())
-    .then(()=>{
-        loadProducts()
-    })
-
-}//end func
-
-*/

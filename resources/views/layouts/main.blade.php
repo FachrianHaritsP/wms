@@ -91,6 +91,28 @@
                 </li>
             </ul>
         @endif
+        
+        {{-- Returns --}}
+        @if(in_array(auth()->user()->role, ['leader','staff']))
+            <a href="/returns" class="d-block text-white text-decoration-none mb-2">
+                Returns
+            </a>
+        @endif
+
+        {{-- Return-Reviews --}}
+        @if(auth()->user()->role == 'leader')
+            <a href="/returns/review" class="d-block text-white text-decoration-none mb-2">
+                Returns review
+            </a>
+        @endif
+
+            {{-- Return-Reviews --}}
+        @if(auth()->user()->role == 'leader')
+            <a href="/stock-opname" class="d-block text-white text-decoration-none mb-2">
+                Stock opname
+            </a>
+        @endif
+
 
         <hr>
 

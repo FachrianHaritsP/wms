@@ -1,3 +1,51 @@
+
+function resetCard(){
+    document.getElementById('product_id').value = '';
+    document.getElementById('qty').value = '';
+    document.getElementById('reason').value = '';
+    document.getElementById('notes').value = '';
+}
+
+function loadReturns(){
+
+    fetch('/returns/data')
+
+    .then(res => res.json())
+
+    .then(data => {
+
+    console.log(data);
+
+    let tbody = document.getElementById('returnTable');
+
+    tbody.innerHTML = '';
+
+        data.data.data.forEach(item => {
+
+            tbody.innerHTML += `
+            
+            <tr>
+
+                <td>${item.product.name}</td>
+
+                <td>${item.qty}</td>
+
+                <td>${item.reason}</td>
+
+                <td>${item.status}</td>
+
+                <td>${item.user.name}</td>
+
+            </tr>
+
+            `;
+
+        });
+
+    })
+
+}
+
 function submitReturn() {
 
     let productId = document.getElementById('product_id').value;
@@ -5,7 +53,7 @@ function submitReturn() {
     let reason = document.getElementById('reason').value;
     let notes = document.getElementById('notes').value;
 
-    fetch('/api/returns', {
+    fetch('/returns', {
         method: 'POST',
 
         headers: {
@@ -22,18 +70,20 @@ function submitReturn() {
 
     })
     .then(res => res.json())//.then(res => res.json())
-    .then(response => {
+    .then(data => { //data => work ; async res=> buat tet
 
-        let data = response.data;
-
+        //let data = response.data; //work
+        //let text = await res.text();
         console.log(data);
 
-        alert('Return berhasil ditambahkan');
-
-        // reset form
-        document.getElementById('qty').value = 1;
-        document.getElementById('reason').value = '';
-
+        if(data.success){
+            alert('Return berhasil ditambahkan');
+             // reset form
+            resetCard();
+            loadReturns();
+        }
+       
+        
     })
     .catch(err => {
         console.log(err);
@@ -41,3 +91,4 @@ function submitReturn() {
     });
 
 }
+
