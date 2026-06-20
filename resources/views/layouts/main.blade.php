@@ -1,41 +1,44 @@
-{{-- <!DOCTYPE html>
-<html>
-<head>
-    <title>Warehouse System</title>
-
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-    @if(auth()->check())
-
-        <div>
-            {{ auth()->user()->name }}
-            ({{ auth()->user()->role }})
-        </div>
-
-        <form method="POST" action="{{ route('logout') }}">
-            @csrf
-            <button class="btn btn-danger btn-sm">
-                Logout
-            </button>
-            <!--<button type="submit">Logout</button>-->
-        </form>
-
-    @endif
-
-    @yield('content')
-
-</body>
-</html> --}}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+
+    .sidebar{
+
+        width:250px;
+        min-height:100vh;
+        transition:0.3s;
+        margin-left:0;
+        overflow-y:auto;
+        overflow-x:hidden;
+
+    }
+
+    .sidebar.active{
+
+        left:0;
+    }
+
+    .sidebar.hide{
+        margin-left: -250px;
+    }
+       
+    /* MOBILE */
+    @media(max-width:768px){
+
+        .sidebar{
+
+            position:fixed;
+            top:0;
+            left:0;
+            z-index:999;
+
+        }
+    }
+    </style>
     <title>Warehouse Management System</title>
 
     {{-- Vite Laravel --}}
@@ -48,12 +51,12 @@
 
 <div class="d-flex">
 
-    <!-- SIDEBAR -->
-    <div class="bg-dark text-white p-3 vh-100" style="width: 200px;">
+     {{-- Sidebar --}}
+    <div id="sidebar" class="sidebar bg-dark text-white p-3">
 
-        <h4>WMS (Warehouse Management System)</h4>
-        <hr>
+        <h4>WMS</h4>
 
+        {{-- menu nanti disini --}}
         {{-- DASHBOARD --}}
         @if(in_array(auth()->user()->role, ['owner', 'leader']))
             <a href="/dashboard" class="d-block text-white text-decoration-none mb-2">
@@ -61,36 +64,42 @@
             </a>
         @endif
 
-
         {{-- INVENTORY --}}
-        @if(auth()->user()->role == 'leader')
+        @if(in_array(auth()->user()->role ,['owner','leader']))
             <a href="/inventory" class="d-block text-white text-decoration-none mb-2">
                 Inventory
             </a>
         @endif
-
+        
         {{-- TRANSACTIONS --}}
         @if(in_array(auth()->user()->role, ['leader', 'staff']))
-            {{-- <a href="/transactions" class="d-block text-white text-decoration-none mb-2">
-                Transactions
-            </a> --}}
-            <ul>
-                <li class="d-block text-white text-decoration-none mb-2">Transactions
-                    <ul>
-                        <li>
-                            <a href="/transactions-in" class="text-success">
-                                Stock-in +
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/transactions-out" class="text-danger">
-                                Stock-out -
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-            </ul>
+        <button
+            class="btn btn-dark w-100 text-start mb-2"
+            onclick="toggleTransactionMenu()">
+
+            Transactions ▼
+
+        </button>
+
+        <div id="transactionMenu" style="display:none;">
+
+            <a href="/transactions-in"
+            class="d-block text-success ms-3 mb-2 text-decoration-none">
+
+                Stock-in +
+
+            </a>
+
+            <a href="/transactions-out"
+            class="d-block text-danger ms-3 mb-2 text-decoration-none">
+
+                Stock-out -
+
+            </a>
+
+        </div>
         @endif
+
         
         {{-- Returns --}}
         @if(in_array(auth()->user()->role, ['leader','staff']))
@@ -113,7 +122,12 @@
             </a>
         @endif
 
-
+         {{-- Reports --}}
+        @if(auth()->user()->role == 'owner')
+            <a href="/reports/index" class="d-block text-white text-decoration-none mb-2">
+                Report
+            </a>
+        @endif
         <hr>
 
          {{-- USER INFO --}}
@@ -131,18 +145,77 @@
                 Logout
             </button>
         </form>
+        
 
     </div>
 
-    <!-- CONTENT -->
-    <div class="p-4 w-100">
-        @yield('content')
+    {{-- Main Content --}}
+    <div class="flex-grow-1">
+
+        {{-- topbar --}}
+        <div class="bg-white shadow-sm p-2">
+
+            <button class="btn btn-dark" onclick="toggleSidebar()">
+                ☰
+            </button>
+
+        </div>
+
+        <div class="p-3">
+
+            @yield('content')
+
+        </div>
+
     </div>
 
 </div>
 
 {{-- Bootstrap JS --}}
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+
+function toggleSidebar(){
+
+    document
+        .getElementById('sidebar')
+        .classList
+        .toggle('hide');
+
+}
+
+function toggleTransactionMenu(){
+
+    let menu =
+        document.getElementById('transactionMenu');
+
+    if(menu.style.display === 'none'){
+
+        menu.style.display = 'block';
+
+    }else{
+
+        menu.style.display = 'none';
+
+    }
+
+}
+
+window.onload = function(){
+
+    if(window.innerWidth <= 768){
+
+        document
+            .getElementById('sidebar')
+            .classList
+            .add('hide');
+
+    }
+
+}
+
+</script>
 
 </body>
 </html>

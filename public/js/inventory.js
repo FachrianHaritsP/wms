@@ -1,81 +1,16 @@
-/* function loadProducts(search = ''){
-
-    let table = document.getElementById('product_table')
-    table.innerHTML = '<tr><td colspan="6" class="text-center">Loading...</td></tr>'
-
-    fetch('/api/warehouse/products?search=' + search) //  http://127.0.0.1:8000/api/warehouse/products
-    .then(res =>res.json())
-    .then(response => {
-        let data =response.data;
-        console.log(data)
-
-        table.innerHTML = ''
-
-        data.forEach(item => {
-        let stockClass = item.stock <= 5 ? 'table-danger' : ''  
-
-            table.innerHTML +=`
-            <tr class="${stockClass}">
-                <td>${item.sku}</td>
-                <td>${item.name}</td>
-                <td>${item.size}</td>
-                <td>${item.color}</td>
-                <td>
-                     ${item.stock <= 5 
-                    ? `<span class="badge bg-danger">${item.stock}</span>` 
-                     : item.stock
-                     }
-                </td>
-                <td>
-                    ${item.rack_slot 
-                        ? item.rack_slot.rack.rack_code + '-' + item.rack_slot.slot_code
-                        : '-'}
-                </td>
-                <td>
-                    <button class="btn btn-warning btn-sm" onclick="openEditModal(${item.id})"> ✏ Edit</button>
-                    <button class="btn btn-danger btn-sm" onclick="openDeleteModal(${item.id})"> 🗑 Delete</button>
-                </td>
-                <td id="qr-${item.id}"></td>
-            </tr>
-            `
-        
-        fetch('/qr/' + encodeURIComponent(item.sku))
-        .then(res => res.text())
-        .then(svg => {
-
-            let qrEl = document.getElementById('qr-' + item.id);
-            console.log(item)
-            console.log(item.id) 
-            if(qrEl){
-                qrEl.innerHTML = svg;
-            } 
-            //document.getElementById('qr-' + item.id).innerHTML = svg
-        })
-            
-        })//end data
-
-         if(data.length === 0){
-            table.innerHTML = '<tr><td colspan="6">No data found</td></tr>'
-        }
-
-
-    })//end fetch
-}//end func */
-
-function loadProducts(search = ''){
+function loadProducts(page = 1, search = ''){
 
     let table = document.getElementById('product_table');
 
-    table.innerHTML =
-    '<tr><td colspan="8" class="text-center">Loading...</td></tr>';
+    table.innerHTML ='<tr><td colspan="8" class="text-center">Loading...</td></tr>';
 
-    fetch('/api/warehouse/products?search=' + search)
+    //fetch('/api/warehouse/products?search=' + search)
+    fetch('/api/warehouse/products?page='+ page +'&search=' + search)
 
     .then(res => res.json())
-
     .then(response => {
 
-        let data = response.data;
+        let data = response.data.data;
 
         table.innerHTML = '';
 
@@ -91,9 +26,9 @@ function loadProducts(search = ''){
 
                 <td>${item.name}</td>
 
-                <td>${item.size}</td>
+                <td class="d-none d-md-table-cell">${item.size}</td>
 
-                <td>${item.color}</td>
+                <td class="d-none d-md-table-cell">${item.color}</td>
 
                 <td>
                     ${item.stock <= 5
@@ -101,7 +36,7 @@ function loadProducts(search = ''){
                     : item.stock}
                 </td>
 
-                <td>
+                <td class="d-none d-md-table-cell">
                     ${item.rack_slot
                     ? item.rack_slot.rack.rack_code + '-' + item.rack_slot.slot_code
                     : '-'}
@@ -113,13 +48,20 @@ function loadProducts(search = ''){
                     ✏ Edit
                     </button>
 
-                    <button class="btn btn-danger btn-sm"
+                    <button class="btn btn-danger btn-sm mt-1"
                     onclick="openDeleteModal(${item.id})">
                     🗑 Delete
                     </button>
+                    
+                    <button class="btn btn-info btn-sm mt-1"
+                    onclick="openInfoModal(${item.id})">
+
+                    ⓘ Info
+
+                    </button>
                 </td>
 
-                <td id="qr-${item.id}"></td>
+                <td id="qr-${item.id}" class="d-none d-md-table-cell"></td>
 
             </tr>
             `;
@@ -151,7 +93,6 @@ function loadProducts(search = ''){
 
     });
 
-    
 }
 
 function openAddModal(){
@@ -193,7 +134,12 @@ function saveProduct(){
     fetch(url, {
         method: method,
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+
+            'X-CSRF-TOKEN':document.querySelector(
+            'meta[name="csrf-token"]'
+        ).content
         },
         body: JSON.stringify(data)
     })
@@ -210,7 +156,8 @@ function openEditModal(id){
 
     fetch('/api/warehouse/products/' + id)
     .then(res => res.json())
-    .then(data => {
+    .then(response => {
+        let data = response.data
 
         document.getElementById('modalTitle').innerText = 'Edit Product'
 
@@ -229,6 +176,47 @@ function openEditModal(id){
     })
 }//end
 
+function openInfoModal(id){
+
+    fetch('/api/warehouse/products/' + id)
+
+    .then(res => res.json())
+
+    .then(response => {
+
+        let data = response.data;
+
+        document.getElementById('info_sku')
+            .innerText = data.sku;
+
+        document.getElementById('info_name')
+            .innerText = data.name;
+
+        document.getElementById('info_size')
+            .innerText = data.size;
+
+        document.getElementById('info_color')
+            .innerText = data.color;
+
+        document.getElementById('info_stock')
+            .innerText = data.stock;
+
+        document.getElementById('info_location')
+            .innerText =
+                data.rack_slot
+                ? data.rack_slot.rack.rack_code
+                    + '-' +
+                    data.rack_slot.slot_code
+                : '-';
+
+        new bootstrap.Modal(
+            document.getElementById('infoModal')
+        ).show();
+
+    });
+
+}//end
+
 function openDeleteModal(id){
 
     document.getElementById('delete_id').value = id
@@ -242,7 +230,7 @@ document.addEventListener('DOMContentLoaded', function(){
     loadProducts()
 
     document.getElementById('search').addEventListener('keyup', function() {
-        loadProducts(this.value)
+        loadProducts(1,this.value)
         console.log("search:", this.value)
     })
 

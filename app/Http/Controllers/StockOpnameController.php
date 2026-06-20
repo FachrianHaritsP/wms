@@ -9,7 +9,7 @@ use App\Models\Product;
 use Illuminate\Support\Facades\Auth;
 
 class StockOpnameController extends Controller
-{
+{  
 
     public function index()
     {
@@ -44,10 +44,8 @@ class StockOpnameController extends Controller
 
     }
 
-
     public function store(Request $request)
-{
-
+    {
     $product = Product::findOrFail(
         $request->product_id
     );
@@ -55,33 +53,104 @@ class StockOpnameController extends Controller
     $system = $product->stock;
     $physical = $request->physical_stock;
     $difference = $physical - $system;
-    
+
     $status = $difference == 0
         ? 'match'
         : 'discrepancy';
 
-    $opname = StockOpname::create([
+    $existing = StockOpname::where(
+        'session_code',
+        $request->session_code
+    )
+    ->where(
+        'product_id',
+        $product->id
+    )
+    ->first();
+
+    if($existing){
+
+        $existing->update([
+
+            'system_stock' => $system,
+            'physical_stock' => $physical,
+            'difference' => $difference,
+            'status' => $status,
+            'session_status' => 'open',
+
+        ]);
+
+        $opname = $existing;
+
+    }else{
+
+        $opname = StockOpname::create([
 
         'product_id' => $product->id,
         'system_stock' => $system,
         'physical_stock' => $physical,
         'difference' => $difference,
         'status' => $status,
+
         'session_code' => $request->session_code,
+        'session_status' => 'open',
+
         'created_by' => Auth::id()
 
-    ]);
+        ]);
+
+    }
 
     return response()->json([
 
         'success' => true,
-
         'data' => $opname
 
-    ]);
-
+        ]);
     }
 
+    public function history(Request $request)
+    {
+        $query = StockOpname::with(
+            'product',
+            'user'
+        );
 
+        if($request->session_code){
+
+            $query->where(
+                'session_code',
+                $request->session_code
+            );
+
+        }
+
+        $opnames = $query
+            ->latest()
+            ->get();
+
+        return response()->json($opnames);
+    }
+
+    public function closeSession(Request $request)
+    {
+        StockOpname::where(
+            'session_code',
+            $request->session_code
+        )
+        ->update([
+
+            'session_status' => 'closed'
+
+        ]);
+
+        return response()->json([
+
+            'success' => true,
+            'message' => 'Session closed'
+
+        ]);
+    }
 
 }
+

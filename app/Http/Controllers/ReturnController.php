@@ -5,87 +5,243 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\ReturnItem;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Product;
 
 class   ReturnController extends Controller
 {
+    //returns
 
-public function index()
-{
-    $returns = ReturnItem::with('product','user')
+    // public function index()
+    // {
+    //     $returns = ReturnItem::with('product','user')
+    //         ->latest()
+    //         ->paginate(10);
+            
+    //     return view('returns', compact('returns'));
+    // }
+
+    // public function index()
+    // {
+    //     $returns = ReturnItem::with(
+    //         'product',
+    //         'user'
+    //     )
+    //     ->where('status','pending')
+    //     ->latest()
+    //     ->paginate(10);
+
+    //     return view(
+    //         'returns',
+    //         compact('returns')
+    //     );
+    // }
+
+    public function index()
+    {
+        $returns = ReturnItem::with(
+            'product',
+            'user'
+        )
+        ->where(
+            'status',
+            'pending'
+        )
         ->latest()
         ->paginate(10);
-        //->get();
 
-    return view('returns', compact('returns'));
-}
+        $products = Product::all();
 
-public function store(Request $request)
-{
-    $request->validate([
-        'product_id' => 'required|exists:products,id',
-        'qty' => 'required|integer|min:1',
-        'reason' => 'required'
-    ]);
+        return view(
+            'returns',
+            compact(
+                'returns',
+                'products'
+            )
+        );
+    }
 
-    $return = ReturnItem::create([
-        'product_id' => $request->product_id,
-        'qty' => $request->qty,
-        'reason' => $request->reason,
-        'status' => 'pending',
-        'created_by' => Auth::id(),
-        'notes' => $request->notes,
-    ]);
+    public function store(Request $request)
+    {
+        $request->validate([
+            'product_id' => 'required|exists:products,id',
+            'qty' => 'required|integer|min:1',
+            'reason' => 'required'
+        ]);
 
-    return response()->json([
-        'success' => true,
-        'message' => 'Return created',
-        'data' => $return
-    ]);
-}
+        $return = ReturnItem::create([
+            'product_id' => $request->product_id,
+            'qty' => $request->qty,
+            'reason' => $request->reason,
+            'status' => 'pending',
+            'created_by' => Auth::id(),
+            'notes' => $request->notes,
+        ]);
 
-public function review()
-{
-    $returns = ReturnItem::with('product','user')
+        return response()->json([
+            'success' => true,
+            'message' => 'Return created',
+            'data' => $return
+        ]);
+    }
+
+    // blade return-review
+    public function review()
+    {
+        // $returns = ReturnItem::with('product','user')
+        //     ->latest()
+        //     ->paginate(10);
+
+        // return view('returns-review', compact('returns'));
+
+        $pendingReturns = ReturnItem::with(
+            'product',
+            'user'
+        )
+
+        ->where(
+            'status',
+            'pending'
+        )
+
         ->latest()
+
+        ->get();
+
+        $historyReturns = ReturnItem::with(
+        'product',
+        'user'
+            )
+
+        ->whereIn(
+            'status',
+            [
+                'approved',
+                'rejected',
+                'cancelled'
+            ]
+        )
+
+        ->latest()
+
         ->paginate(10);
 
-    return view('returns-review', compact('returns'));
-}
+        return view(
+        'returns-review',
+        compact(
+        'pendingReturns',
+        'historyReturns'
+        )
+        );
+    }
 
-public function approve($id)
-{
-    $return = ReturnItem::findOrFail($id);
+    public function approve($id)
+    {
+        $return = ReturnItem::findOrFail($id);
 
-    if($return->status != 'pending'){
+        if($return->status != 'pending'){
 
-    return back();
+        return back();
+
+        }
+
+        $return->status = 'approved';
+
+        $return->save();
+
+        $product = $return->product;
+        $product->stock += $return->qty;
+        $product->save();
+
+        return back();
 
     }
 
-    $return->status = 'approved';
+    public function update(Request $request,$id)
+    {
+        $return = ReturnItem::findOrFail(
+            $id
+        );
 
-    $return->save();
+        if(
+            $return->status != 'pending'
+        ){
 
-    $product = $return->product;
-    $product->stock += $return->qty;
-    $product->save();
+            return response()->json([
 
-    return back();
+                'success' => false,
+                'message' =>
+                'Return tidak dapat diubah'
 
-}
+            ],400);
 
-public function reject($id)
-{
-    $return = ReturnItem::findOrFail($id);
-    if($return->status != 'pending'){
+        }
 
-    return back();
+        $return->update([
 
+            'product_id' =>
+            $request->product_id,
+
+            'qty' =>
+            $request->qty,
+
+            'reason' =>
+            $request->reason,
+
+            'notes' =>
+            $request->notes
+
+        ]);
+
+        return response()->json([
+
+            'success' => true,
+
+            'message' =>
+            'Return berhasil diperbarui'
+
+        ]);
     }
-    $return->status = 'rejected';
 
-    $return->save();
-    return back();
-}
+    public function reject($id)
+    {
+        $return = ReturnItem::findOrFail($id);
+        if($return->status != 'pending'){
+
+        return back();
+
+        }
+        $return->status = 'rejected';
+
+        $return->save();
+        return back();
+    }
+
+    public function cancel($id)
+    {
+        $return = ReturnItem::findOrFail($id);
+
+        if($return->status != 'pending'){
+
+            return response()->json([
+
+                'success' => false,
+                'message' => 'Return tidak dapat dibatalkan'
+
+            ], 400);
+
+        }
+
+        $return->status = 'cancelled';
+
+        $return->save();
+
+        return response()->json([
+
+            'success' => true,
+            'message' => 'Return berhasil dibatalkan'
+
+        ]);
+    }
+
 
 }

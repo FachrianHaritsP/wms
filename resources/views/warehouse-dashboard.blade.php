@@ -12,8 +12,7 @@
     <div  class="dashboard-container-fluid">
 
         <!-- KPI -->
-        <div class="container-fluid mt-4", class="card shadow",
-        class="table table-striped"> 
+        <div class="container-fluid mt-4" class="card shadow" lass="table table-striped"> 
 
             <div class="row text-center">
 

@@ -1,3 +1,9 @@
+
+let transactions = [];
+
+const role = document.querySelector('meta[name="user-role"]').content;
+const transactionType = document.querySelector('meta[name="transaction-type"]')?.content;
+
 function resetCard(){
 
     document.getElementById('product_sku').innerText = '';
@@ -72,7 +78,8 @@ function stockIn(){
     let product_id = document.getElementById('product_id').value;
     let qty = document.getElementById('qty').value;
 
-    fetch('/api/warehouse/stock-in', {
+    ///api/warehouse/stock-in
+    fetch('/warehouse/stock-in', {
 
         method: 'POST',
 
@@ -91,7 +98,7 @@ function stockIn(){
     .then(res => res.json())
 
     .then(() => {
-
+         //console.log(data);
         loadHistory();
 
         resetAfterTransaction();
@@ -139,7 +146,7 @@ function loadProducts(){
     .then(res => res.json())
     .then(response => {
 
-        let data = response.data;
+        let data = response.data.data;
 
         let select = document.getElementById('product_id')
 
@@ -158,25 +165,71 @@ function loadProducts(){
 
 function loadHistory(){
 
-    fetch('/api/warehouse/transactions')
+    // mix default '/api/warehouse/transactions'
+    fetch('/api/warehouse/transactions?type=' + transactionType)  
     .then(res => res.json())
     .then(response => {
 
         let data = response.data;
 
+        transactions = data.data;
+       
         let table = document.getElementById('history_table')
         table.innerHTML = ''
 
         //bawaan item.created_at
         data.data.forEach(item => {
+            console.log(item);
+            let action = '';
+            //date vali
+            let today =
+            new Date()
+            .toISOString()
+            .split('T')[0];
 
+            let transactionDate =
+            item.created_at
+            .split('T')[0];
+
+            console.log('today:', today);
+            console.log('transactionDate:', transactionDate);
+            console.log('created_at:', item.created_at);
+
+            if(role === 'leader'){
+
+                action = `
+                   <button
+                    class="btn btn-warning btn-sm"
+                    onclick="editTransaction(${item.id})">
+
+                    Edit
+
+                </button>
+                `;
+
+            }else if(
+                    role === 'staff'
+                    &&
+                    transactionDate === today
+                ){
+
+                    action = `
+                    <button
+                            class="btn btn-warning btn-sm"
+                            onclick="editTransaction(${item.id})">
+
+                            Edit
+
+                        </button>
+                    `;
+
+                }
             table.innerHTML += `
             <tr>
                 <td>${item.product.name}</td>
-                <td>${item.type}</td>
                 <td>${item.qty}</td>
-                <td>${new Date(item.created_at).toLocaleString('id-ID')}</td> 
                 <td>${item.user.name}</td>
+                <td>${action}</td>
             </tr>
             `
         })
@@ -207,6 +260,110 @@ function startScanner(){
         }
     )
 }
+
+function fillProductCardEdit(product){
+
+    document.getElementById('product_sku').innerText = product.sku;
+    document.getElementById('product_size').innerText = product.size;
+    document.getElementById('product_color').innerText = product.color;
+    document.getElementById('product_stock').innerText = product.stock;
+
+    document.getElementById('product_location').innerText =
+        product.rack_slot
+        ? product.rack_slot.rack.rack_code + ' - ' + product.rack_slot.slot_code
+        : '-';
+
+}
+
+function editTransaction(id){
+
+    let transaction =
+        transactions.find(
+            item => item.id == id
+        );
+
+    document
+    .getElementById('transaction_id')
+    .value =
+    transaction.id;
+
+    document
+    .getElementById('product_id')
+    .value =
+    transaction.product_id;
+    
+    document
+    .getElementById('qty')
+    .value =
+    transaction.qty;
+
+    fillProductCardEdit(transaction.product);
+}
+
+
+
+   function updateTransaction(){
+
+    let transaction_id =
+        document.getElementById(
+            'transaction_id'
+        ).value;
+
+    let qty =
+        document.getElementById(
+            'qty'
+        ).value;
+
+    if(!transaction_id){
+
+    alert('Pilih transaksi terlebih dahulu');
+
+    return;
+    }
+
+    fetch(
+        '/transactions/' + transaction_id,
+        {
+
+            method: 'PUT',
+
+            headers: {
+
+                'Content-Type':'application/json',
+
+                'X-CSRF-TOKEN':
+                document.querySelector(
+                    'meta[name="csrf-token"]'
+                ).content
+
+            },
+
+            body: JSON.stringify({
+
+                qty: qty
+
+            })
+
+        }
+
+    )
+
+    .then(res => res.json())
+
+    .then(data => {
+
+        alert(data.message);
+
+        loadHistory();
+
+        resetAfterTransaction();
+        document.getElementById(
+            'transaction_id'
+        ).value = '';
+
+    });
+
+    }
 
 loadProducts()
 loadHistory()

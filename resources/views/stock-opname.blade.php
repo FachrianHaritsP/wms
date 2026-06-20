@@ -2,7 +2,7 @@
 
 @section('content')
 
-<div class="container">
+<div class="contaier-fluid">
 
     <h3 class="mb-4 font-bold text-xl">
         Stock Opname
@@ -11,23 +11,25 @@
     <div class="row">
 
         {{-- Scan Card --}}
-        <div class="col-md-4">
+        <div class="col-lg-4 mb-3">
             <div class="mb-4">        
-                    {{-- <span class="bg-blue-200 px-3 py-2 rounded">
-
-                        Items Checked :
-                        {{ $totalChecked }} <!-- klo dari db -->
-
-                    </span> --}}
                     <span id="counter" class="bg-blue-200 px-3 py-2 rounded">Items Checked : 0</span>
-            </div>
-            <div class="mb-3">
-                <button onclick="startOpname()" class="btn btn-primary">
+            </div >
+                Session :
+                <span id="session_code">
+                    -
+                </span>
+                <div>
+                <button onclick="startOpname()" class="btn btn-primary md-3">
                     Start Opname
+                </button>
+                <button onclick="closeSession()"
+                        class="btn btn-danger">
+                    Close Session
                 </button>
             </div>   
             <div id="opnameForm" style="display:none;">
-                <div class="card p-3">
+                <div class="card p-2">
                     <div class="mb-3">
                         <label class="mb-2">
                         Scan QR
@@ -92,197 +94,157 @@
         </div>
 
         {{-- History --}}
-        <div class="col-md-8">
+        <div class="col-lg-8">
 
             {{-- History Opname --}}
-            <div class="card p-3">
+            <div class="card p-2">
+                <div class="table-responsive">
 
-                <h5 class="font-bold mb-3">
-                    History Stock Opname
-                </h5>
+                    <h5 class="font-bold mb-3">
+                        History Stock Opname
+                    </h5>
 
-                <table class="table-auto w-full border mt-4">
+                    <table class="table table-bordered table-striped table-sm small">
 
-                    <thead>
+                        <thead>
 
-                        <tr class="bg-gray-200">
+                            <tr class="bg-gray-200">
 
-                            <th class="border px-2 py-2">
-                                Product
-                            </th>
+                                <th class="border px-2 py-2">
+                                    Product
+                                </th>
 
-                            <th class="border px-2 py-2">
-                                System
-                            </th>
+                                <th class="border px-2 py-2">
+                                    System
+                                </th>
 
-                            <th class="border px-2 py-2">
-                                Physical
-                            </th>
+                                <th class="border px-2 py-2">
+                                    Physical
+                                </th>
 
-                            <th class="border px-2 py-2">
-                                Difference
-                            </th>
+                                <th class="border px-2 py-2 d-none d-md-table-cell">
+                                    Difference
+                                </th>
 
-                            <th class="border px-2 py-2">
-                                Status
-                            </th>
+                                <th class="border px-2 py-2">
+                                    Status
+                                </th>
 
-                            <th class="border px-2 py-2">
-                                User
-                            </th>
+                                <th class="border px-2 py-2 d-none d-md-table-cell">
+                                    User
+                                </th>
 
-                        </tr>
+                            </tr>
 
-                    </thead>
+                        </thead>
 
-                    <tbody>
+                        <tbody id="history_table">
 
-                        @foreach($opnames as $opname)
+                        </tbody>
 
-                        <tr>
+                    </table>
 
-                            <td class="border px-2 py-2">
-                                {{ $opname->product->name }}
-                            </td>
+                    <div class="mt-4">
 
-                            <td class="border px-2 py-2">
-                                {{ $opname->system_stock }}
-                            </td>
+                        {{ $opnames->links() }}
 
-                            <td class="border px-2 py-2">
-                                {{ $opname->physical_stock }}
-                            </td>
-
-                            <td class="border px-2 py-2">
-                                {{ $opname->difference }}
-                            </td>
-
-                            <td class="border px-2 py-2">
-
-                                @if($opname->status == 'match')
-
-                                    <span class="bg-green-200 px-2 py-1 rounded">
-
-                                        Match
-
-                                    </span>
-
-                                @else
-
-                                    <span class="bg-red-200 px-2 py-1 rounded">
-
-                                        Discrepancy
-
-                                    </span>
-
-                                @endif
-
-                            </td>
-
-                            <td class="border px-2 py-2">
-                                {{ $opname->user->name }}
-                            </td>
-
-                        </tr>
-
-                        @endforeach
-
-                    </tbody>
-
-                </table>
-
-                <div class="mt-4">
-
-                    {{ $opnames->links() }}
-
+                    </div>
                 </div>
-
             </div>
 
             {{-- Related Returns --}}
-            <div class="card p-3 mt-4">
+            <div class="accordion mt-4" id="returnAccordion">    
 
-                <h5 class="font-bold mb-3">
+                <h2>
 
-                    Related Returns
+                    <button class="btn btn-secondary w-100" onclick="toggleReturns()">
 
-                </h5>
+                        Related Returns ▼
 
-                <table class="table-auto w-full border">
+                    </button>
 
-                    <thead>
+                </h2>
+       
+                <div id="returnSection" style="display:none;" class="mt-3">   
+                    {{-- bungkus --}}
 
-                        <tr class="bg-gray-200">
+                    <table class="table table-bordered table-striped table-sm small">
 
-                            <th class="border px-2 py-2">
-                                Product
-                            </th>
+                        <thead>
 
-                            <th class="border px-2 py-2">
-                                Qty
-                            </th>
+                            <tr class="bg-gray-200">
 
-                            <th class="border px-2 py-2">
-                                Reason
-                            </th>
+                                <th class="border px-2 py-2">
+                                    Product
+                                </th>
 
-                            <th class="border px-2 py-2">
-                                Status
-                            </th>
+                                <th class="border px-2 py-2">
+                                    Qty
+                                </th>
 
-                        </tr>
+                                <th class="border px-2 py-2">
+                                    Reason
+                                </th>
 
-                    </thead>
+                                <th class="border px-2 py-2">
+                                    Status
+                                </th>
 
-                    <tbody>
+                            </tr>
 
-                        @foreach($returns as $return)
+                        </thead>
 
-                        <tr>
+                        <tbody>
 
-                            <td class="border px-2 py-2">
-                                {{ $return->product->name }}
-                            </td>
+                            @foreach($returns as $return)
 
-                            <td class="border px-2 py-2">
-                                {{ $return->qty }}
-                            </td>
+                            <tr>
 
-                            <td class="border px-2 py-2">
-                                {{ $return->reason }}
-                            </td>
+                                <td class="border px-2 py-2">
+                                    {{ $return->product->name }}
+                                </td>
 
-                            <td class="border px-2 py-2">
+                                <td class="border px-2 py-2">
+                                    {{ $return->qty }}
+                                </td>
 
-                                @if($return->status == 'pending')
+                                <td class="border px-2 py-2">
+                                    {{ $return->reason }}
+                                </td>
 
-                                    <span class="bg-yellow-200 px-2 py-1 rounded">
+                                <td class="border px-2 py-2">
 
-                                        Pending
+                                    @if($return->status == 'pending')
 
-                                    </span>
+                                        <span class="bg-yellow-200 px-2 py-1 rounded">
 
-                                @else
+                                            Pending
 
-                                    <span class="bg-red-200 px-2 py-1 rounded">
+                                        </span>
 
-                                        Rejected
+                                    @else
 
-                                    </span>
+                                        <span class="bg-red-200 px-2 py-1 rounded">
 
-                                @endif
+                                            Rejected
 
-                            </td>
+                                        </span>
 
-                        </tr>
+                                    @endif
 
-                        @endforeach
+                                </td>
 
-                    </tbody>
+                            </tr>
 
-                </table>
+                            @endforeach
 
-            </div>
+                        </tbody>
+
+                    </table>
+                    
+                </div>  
+
+            </div> <! --sss -->
 
         </div>
 
@@ -290,6 +252,28 @@
 
 </div>
 
-@endsection
+
+<script>
+
+function toggleReturns(){
+
+    let section =
+        document.getElementById('returnSection');
+
+    if(section.style.display === 'none'){
+
+        section.style.display = 'block';
+
+    }else{
+
+        section.style.display = 'none';
+
+    }
+
+}
+
+</script>
 <script src="https://unpkg.com/html5-qrcode"></script>
 <script src="{{ asset('js/stock-opname.js') }}"></script>
+
+@endsection

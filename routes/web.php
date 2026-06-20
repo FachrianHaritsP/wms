@@ -6,6 +6,7 @@ use App\Http\Controllers\ScanController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\ReturnController;
 use App\Http\Controllers\StockOpnameController;
+use App\Http\Controllers\ReportController;
 use App\Models\RackSlot;
 
 Route::get('/', function () {
@@ -25,7 +26,7 @@ Route::middleware('auth')->group(function () {
 });
 
 //inventory
-Route::middleware(['auth', 'role:leader'])->group(function () {
+Route::middleware(['auth', 'role:owner,leader'])->group(function () {
 
     Route::get('/inventory', function () {
         return view('inventory');
@@ -40,14 +41,6 @@ Route::get('/inventory', function () {
     return view('inventory', compact('rackSlots'));
 
 })->middleware(['auth']);
-
-/* Route::middleware(['auth', 'role:leader,staff'])->group(function () {
-
-    Route::get('/transactions', function () {
-        return view('transactions');
-    });
-
-});  */
 
 //transactions
 Route::middleware(['auth', 'role:leader,staff'])->group(function () {
@@ -66,11 +59,12 @@ Route::middleware(['auth', 'role:leader,staff'])->group(function () {
 
 }); 
 
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'role:leader,staff'])->group(function () {
 
     Route::post('/warehouse/stock-in', [StockController::class, 'stockIn']);
     Route::post('/warehouse/stock-out', [StockController::class, 'stockOut']);
 
+    Route::put('/transactions/{id}',[StockController::class,'update'])->middleware(['auth']);
 });
 
 
@@ -84,6 +78,8 @@ Route::get('/returns',[ReturnController::class,'index'])->middleware(['auth']);
 Route::get('/returns/review', [ReturnController::class,'review']);
 Route::patch('/returns/{id}/approve',[ReturnController::class,'approve']);
 Route::patch('/returns/{id}/reject',[ReturnController::class,'reject']);
+Route::post('/returns/{id}/cancel',[ReturnController::class, 'cancel']);
+Route::put('/returns/{id}',[ReturnController::class,'update']);
 
 //stockopname
 Route::middleware(['auth', 'role:leader'])->group(function () {
@@ -95,7 +91,16 @@ Route::middleware(['auth', 'role:leader'])->group(function () {
     Route::post('/stock-opname',[StockOpnameController::class,'store']);
     Route::get('/stock-opname/data',[StockOpnameController::class,'data']);
     Route::get('/warehouse/scan/{barcode}',[ScanController::class,'scan']);
+    Route::post('/stock-opname/close',[StockOpnameController::class,'closeSession']
+);
+
 }); 
+
+
+//report
+Route::middleware(['auth', 'role:owner'])->group(function() {
+    Route::get('/reports/index', [ReportController::class, 'index']);
+});
 
 
 

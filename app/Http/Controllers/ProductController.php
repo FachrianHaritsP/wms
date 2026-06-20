@@ -28,7 +28,7 @@ class ProductController extends Controller
         }
     
         //$product = $query->get(); work bawaan
-        $products = $query->with('rackSlot.rack')->get();
+        $products = $query->with('rackSlot.rack')->paginate(10); // ->get();
         //$products = Product::with('rackSlot.rack')->get(); bug search tidak jalan klo pake ini
 
 
@@ -44,7 +44,7 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'sku' => 'required|unique:products,sku',
+            'sku' => 'required|unique:products,sku,',
             'name' => 'required',
             'size' => 'required',
             'color' => 'required',
@@ -68,48 +68,11 @@ class ProductController extends Controller
         ]);
     }
 
-  /*   public function store(Request $request)
-    {    
-        
-        $validator = Validator::make($request->all(),[
-            'sku' => 'required|unique:products,sku',
-            'name' => 'required',
-            'size' => 'required',
-            'color' => 'required',
-            'stock' => 'required|integer|min:0',
-            ]);  
-            
-        if($validator->fails()){
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $validator->errors()
-            ],422);
-
-        }
-
-        $product = Product::create([
-            'sku' => $request->sku,
-            'name' => $request->name,
-            'size' => $request->size,
-            'color' => $request->color,
-            'stock' => $request->stock,
-            'rack_slot_id' => $request->rack_slot_id,
-        ]);
-
-            //return response()->json($product);
-        return response()->json([
-            'success' => true,
-            'message' => 'Product fetched',
-            'data' => $product
-        ]);
-
-    }//end */
-
     public function show($id)
     {
-        $product = Product::find($id);
+        //$product = Product::find($id);
+        $product = Product::with('rackSlot.rack')
+            ->find($id);
 
         if(!$product){
             /* return response()->json([
@@ -131,10 +94,12 @@ class ProductController extends Controller
 
     public function update(Request $request, $id)
     {
-        $product = Product::find($id);
+        //$product = Product::find($id);
+        $product = Product::with('rackSlot.rack')
+            ->find($id);
 
         $request->validate([
-            'sku' => 'required|unique:products,sku',
+            'sku' => 'required|unique:products,sku,' . $id,
             'name' => 'required',
             'size' => 'required',
             'color' => 'required',

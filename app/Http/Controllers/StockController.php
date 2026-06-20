@@ -41,11 +41,17 @@ class StockController extends Controller
             'created_by' => Auth::id()
         ]);
 
-        ActivityLog::create([
+
+        try
+        {
+            ActivityLog::create([
             'user_id' => Auth::id(),
             'action'=>'stock_in',
             'description'=>'Menambah stok produk ' .$product->sku. ' sebanyak '. $request->qty,
-        ]);
+            ]);
+        } catch(\Exception $e){
+            dd($e->getMessage());
+        }        
 
         return response()->json([
             'success' => true,
@@ -87,7 +93,8 @@ class StockController extends Controller
         StockTransaction::create([
             'product_id' => $product->id,
             'type' => 'out',
-            'qty' => $request->qty
+            'qty' => $request->qty,
+            'created_by' => Auth::id()
         ]);
 
         ActivityLog::create([
@@ -103,12 +110,23 @@ class StockController extends Controller
         ]);
     }//end stockout
 
-    function history()
+    function history(Request $request)
     {
-         $transactions = StockTransaction::with('product','user')
+        $query = StockTransaction::with(
+            'product.rackSlot.rack',
+            'user'
+        );
+         if($request->type){
+            $query->where(
+                'type',
+                $request->type
+            );
+        }
+
+        $transactions = $query
                     ->latest()
                     ->paginate(10);
-                    //->get();
+                    //->get();    
 
         return response()->json([
             'success'=>true,
@@ -117,5 +135,44 @@ class StockController extends Controller
         ]);
 
     }//end history inev
+
+   public function update(Request $request, $id)
+    {
+        $request->validate([
+            'qty' => 'required|integer|min:1'
+        ]);
+
+        $transaction = StockTransaction::findOrFail($id);
+
+        $product = $transaction->product;
+        
+        //ambil qty lama dan baru
+        $oldQty = $transaction->qty;
+        $newQty = $request->qty;
+        //cari selisih
+        $diff = $newQty - $oldQty;
+
+        if($transaction->type == 'in'){
+
+            $product->stock += $diff;
+
+        }else{
+
+            $product->stock -= $diff;
+
+        }
+
+        $transaction->qty = $newQty;
+        $product->save();
+
+        $transaction->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Transaction updated'
+        ]);
+
+    }
+
 
 }//end stockcontroller

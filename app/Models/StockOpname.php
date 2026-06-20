@@ -13,6 +13,7 @@ class StockOpname extends Model
         'physical_stock',
         'difference',
         'status',
+        'session_code',
         'created_by'
 
     ];
