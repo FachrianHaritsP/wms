@@ -2,39 +2,50 @@
 
 @section('content')
 
-<div class="container-fluid">
+<div class="card p-3 mb-3">
 
     <h2 class="mb-4">
-        Stock Movement Report
+        Report
     </h2>
 
     {{-- filter  date --}}
     <div class="row mb-3">
+        <form method="GET">
+            <div class="col-md-4  mb-3">
 
-        <div class="col-md-4 mb-2">
+                {{-- <input type="date"
+                    class="form-control"> --}}
+                <input
+                    type="date"
+                    name="start_date"
+                    class="form-control"
+                    value="{{ request('start_date') }}"
+                >
 
-            <input type="date"
-                class="form-control">
+            </div>
+            <div class="col-md-4 mb-3">
 
-        </div>
+                {{-- <input type="date"
+                    class="form-control"> --}}
+                <input
+                    type="date"
+                    name="end_date"
+                    class="form-control"
+                    value="{{ request('end_date') }}"
+                >
 
-        <div class="col-md-4 mb-2">
+            </div>
+        
+            <div class="col-md-4 mb-2">
 
-            <input type="date"
-                class="form-control">
+                <button type="submit" class="btn btn-primary w-100">
 
-        </div>
+                    Filter
 
-        <div class="col-md-4 mb-2">
+                </button>
 
-            <button class="btn btn-primary w-100">
-
-                Filter
-
-            </button>
-
-        </div>
-
+            </div>
+        </form>
     </div>
 
     {{-- KPI --}}
@@ -155,78 +166,6 @@
 
     </div>
 
-    {{-- Low Stock --}}
-    <div class="card shadow p-3 mb-4">
-
-        <h5 class="mb-3">
-
-            Low Stock Alert
-
-        </h5>
-
-        <div class="table-responsive">
-
-            <table class="table table-bordered table-sm">
-
-                <thead class="table-danger">
-
-                    <tr>
-
-                        <th>Product</th>
-
-                        <th>Stock</th>
-
-                    </tr>
-
-                </thead>
-
-                <tbody>
-
-                    @forelse($lowStocks as $item)
-
-                    <tr>
-
-                        <td>
-
-                            {{ $item->name }}
-
-                        </td>
-
-                        <td>
-
-                            <span class="badge bg-danger">
-
-                                {{ $item->stock }}
-
-                            </span>
-
-                        </td>
-
-                    </tr>
-
-                    @empty
-
-                    <tr>
-
-                        <td colspan="2"
-                            class="text-center">
-
-                            No Low Stock
-
-                        </td>
-
-                    </tr>
-
-                    @endforelse
-
-                </tbody>
-
-            </table>
-
-        </div>
-
-    </div>
-
     {{-- return-report --}}
     <div class="card shadow p-3 mb-4">
 
@@ -340,6 +279,7 @@
                         <th>Session Code</th>
                         <th>Match</th>
                         <th>Discrepancy</th>
+                        <th>Progress</th>
 
                     </tr>
 
@@ -373,6 +313,9 @@
 
                             </span>
 
+                        </td>
+                        <td>
+                            {{ $item->checked_products }}/{{ $totalProducts }}
                         </td>
 
                     </tr>
@@ -515,6 +458,81 @@
 
     </div>
 
+</div>
+
+{{-- Card beda ga masuk filter --}}
+<div class="card p-3 mb-4">
+    {{-- Low Stock --}}
+    <div class="card shadow p-3 mb-4">
+
+        <h5 class="mb-3">
+
+            Low Stock Alert
+
+        </h5>
+
+        <div class="table-responsive">
+
+            <table class="table table-bordered table-sm">
+
+                <thead class="table-danger">
+
+                    <tr>
+
+                        <th>Product</th>
+
+                        <th>Stock</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    @forelse($lowStocks as $item)
+
+                    <tr>
+
+                        <td>
+
+                            {{ $item->name }}
+
+                        </td>
+
+                        <td>
+
+                            <span class="badge bg-danger">
+
+                                {{ $item->stock }}
+
+                            </span>
+
+                        </td>
+
+                    </tr>
+
+                    @empty
+
+                    <tr>
+
+                        <td colspan="2"
+                            class="text-center">
+
+                            No Low Stock
+
+                        </td>
+
+                    </tr>
+
+                    @endforelse
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
 </div>
 
 @endsection

@@ -1,11 +1,16 @@
 @extends('layouts.main')
 
 @section('content')
-<h2 class="mt-2"> Dashboard</h2>
 <!-- Content -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <div class="container-fluid">
+    <h2 class="mt-3"> Dashboard</h2>
+    <select id="period_filter" onchange="loadDashboard()">
+        <option value="today">Today</option>
+        <option value="week">This Week</option>
+        <option value="month">This Month</option>
+    </select>
 
     <!-- bungkus -->
     

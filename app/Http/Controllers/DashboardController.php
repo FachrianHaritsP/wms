@@ -9,28 +9,92 @@ use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
-    //
-    public function index()
+    public function index(Request $request)
     {
+        $period = $request->period ?? 'today';
 
-       return response()->json([
-        'success' => true,
-        'message' => 'found',
-        'kpi' => $this->getKpi(),
-        'low_stock' => $this->getLowStock(),
-        'product_movement' => $this->getProductMovement(),
-        'stock_movement' => $this->getStockMovement()
+        return response()->json([
+
+            'success' => true,
+            'message' => 'found',
+
+            'kpi' => $this->getKPI($period),
+
+            'low_stock' => $this->getLowStock(),
+
+            'product_movement' => $this->getProductMovement($period),
+
+            'stock_movement' => $this->getStockMovement($period)
+
         ]);
+    }
 
-    }//end index
-
-    private function getKPI()
+    private function getKPI($period)
     {
+        $stockIn = StockTransaction::where(
+            'type',
+            'in'
+        );
+
+        $stockOut = StockTransaction::where(
+            'type',
+            'out'
+        );
+
+        if($period == 'today'){
+
+            $stockIn->whereDate(
+                'created_at',
+                today()
+            );
+
+            $stockOut->whereDate(
+                'created_at',
+                today()
+            );
+
+        }elseif($period == 'week'){
+
+            $stockIn->whereBetween(
+                'created_at',
+                [
+                    now()->startOfWeek(),
+                    now()->endOfWeek()
+                ]
+            );
+
+            $stockOut->whereBetween(
+                'created_at',
+                [
+                    now()->startOfWeek(),
+                    now()->endOfWeek()
+                ]
+            );
+
+        }elseif($period == 'month'){
+
+            $stockIn->whereMonth(
+                'created_at',
+                now()->month
+            );
+
+            $stockOut->whereMonth(
+                'created_at',
+                now()->month
+            );
+
+        }
+
         return [
+
             'total_products' => Product::count(),
+
             'total_stock' => Product::sum('stock'),
-            'stock_in' => StockTransaction::where('type','in')->sum('qty'),
-            'stock_out' => StockTransaction::where('type','out')->sum('qty')
+
+            'stock_in' => $stockIn->sum('qty'),
+
+            'stock_out' => $stockOut->sum('qty')
+
         ];
     }
 
@@ -39,34 +103,174 @@ class DashboardController extends Controller
     return Product::where('stock','<=',5)->get();
     }
 
-    private function getProductMovement()
+    // private function getProductMovement($period )
+    // {
+    //     return StockTransaction::select(
+    //         //'product_id',
+    //         'products.name',
+    //         'products.sku',
+    //         //DB::raw('SUM(qty) as total_out')
+    //         DB::raw('SUM(stock_transactions.qty) as total_out')
+    //     )
+    //     ->join('products','products.id','=','stock_transactions.product_id')
+    //     ->where('stock_transactions.type','out')
+    //     ->groupBy('products.name','products.sku')
+    //     ->orderByDesc('total_out')
+    //     ->take(5)
+    //     ->get();
+    // }
+
+    private function getProductMovement($period)
     {
-        return StockTransaction::select(
-            //'product_id',
+        $query = StockTransaction::select(
+
             'products.name',
             'products.sku',
-            //DB::raw('SUM(qty) as total_out')
-            DB::raw('SUM(stock_transactions.qty) as total_out')
+
+            DB::raw(
+                'SUM(stock_transactions.qty) as total_out'
+            )
+
         )
-        ->join('products','products.id','=','stock_transactions.product_id')
-        ->where('stock_transactions.type','out')
-        ->groupBy('products.name','products.sku')
-        ->orderByDesc('total_out')
-        ->take(5)
-        ->get();
+        ->join(
+            'products',
+            'products.id',
+            '=',
+            'stock_transactions.product_id'
+        )
+        ->where(
+            'stock_transactions.type',
+            'out'
+        );
+
+        if($period == 'today'){
+
+            $query->whereDate(
+                'stock_transactions.created_at',
+                today()
+            );
+
+        }elseif($period == 'week'){
+
+            $query->whereBetween(
+                'stock_transactions.created_at',
+                [
+                    now()->startOfWeek(),
+                    now()->endOfWeek()
+                ]
+            );
+
+        }elseif($period == 'month'){
+
+            $query->whereMonth(
+                'stock_transactions.created_at',
+                now()->month
+            );
+
+        }
+
+        return $query
+            ->groupBy(
+                'products.name',
+                'products.sku'
+            )
+            ->orderByDesc(
+                'total_out'
+            )
+            ->take(5)
+            ->get();
     }
 
-    private function getStockMovement()
+    // private function getStockMovement()
+    // {
+    //     return StockTransaction::select(
+    //         DB::raw('DATE(created_at) as date'),
+    //         DB::raw('SUM(CASE WHEN type="in" THEN qty ELSE 0 END) as total_in'),
+    //         DB::raw('SUM(CASE WHEN type="out" THEN qty ELSE 0 END) as total_out')
+    //     )
+    //     ->groupBy('date')
+    //     ->orderBy('date','desc')
+    //     ->take(7)
+    //     ->get();
+    // }
+
+    private function getStockMovement($period)
     {
-        return StockTransaction::select(
+        $query = StockTransaction::select(
+
             DB::raw('DATE(created_at) as date'),
-            DB::raw('SUM(CASE WHEN type="in" THEN qty ELSE 0 END) as total_in'),
-            DB::raw('SUM(CASE WHEN type="out" THEN qty ELSE 0 END) as total_out')
-        )
-        ->groupBy('date')
-        ->orderBy('date','desc')
-        ->take(7)
-        ->get();
+
+            DB::raw(
+                'SUM(CASE WHEN type="in" THEN qty ELSE 0 END) as total_in'
+            ),
+
+            DB::raw(
+                'SUM(CASE WHEN type="out" THEN qty ELSE 0 END) as total_out'
+            )
+
+        );
+
+        if($period == 'today'){
+
+            $query->whereDate(
+                'created_at',
+                today()
+            );
+
+        }elseif($period == 'week'){
+
+            $query->whereBetween(
+                'created_at',
+                [
+                    now()->startOfWeek(),
+                    now()->endOfWeek()
+                ]
+            );
+
+        }elseif($period == 'month'){
+
+            $query->whereMonth(
+                'created_at',
+                now()->month
+            );
+
+        }
+
+        return $query
+            ->groupBy('date')
+            ->orderBy('date','desc')
+            ->take(7)
+            ->get();
+    }
+
+    private function getDateFilter($query, $period)
+    {
+        if($period == 'today'){
+
+            $query->whereDate(
+                'created_at',
+                today()
+            );
+
+        }elseif($period == 'week'){
+
+            $query->whereBetween(
+                'created_at',
+                [
+                    now()->startOfWeek(),
+                    now()->endOfWeek()
+                ]
+            );
+
+        }elseif($period == 'month'){
+
+            $query->whereMonth(
+                'created_at',
+                now()->month
+            );
+        }
+
+        return $query;
     }
 
 
