@@ -11,6 +11,20 @@ use Illuminate\Support\Facades\Auth;
 class StockOpnameController extends Controller
 {  
 
+    public function activeSession()
+    {
+        $session = StockOpname::where(
+            'session_status',
+            'open'
+        )
+        ->latest()
+        ->first();
+
+        return response()->json([
+            'session' => $session
+        ]);
+    }
+
     public function index()
     {
 
@@ -46,9 +60,30 @@ class StockOpnameController extends Controller
 
     public function store(Request $request)
     {
-    $product = Product::findOrFail(
-        $request->product_id
-    );
+        $product = Product::findOrFail(
+            $request->product_id
+        );
+
+    //btn
+    $session = StockOpname::where(
+    'session_code',
+    $request->session_code
+        )
+        ->first();
+
+        if(
+            $session &&
+            $session->session_status === 'closed'
+        ){
+
+            return response()->json([
+
+                'success' => false,
+                'message' => 'Session already closed'
+
+            ], 400);
+
+        }
 
     $system = $product->stock;
     $physical = $request->physical_stock;

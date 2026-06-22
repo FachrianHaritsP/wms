@@ -1,9 +1,6 @@
 let sessionCounter = 0;
 
-let opnameSession =
-    localStorage.getItem(
-        'opname_session'
-    );
+let opnameSession = '';
 
 if(opnameSession){
 
@@ -11,10 +8,11 @@ if(opnameSession){
         'opnameForm'
     ).style.display = 'block';
 
-    document.getElementById(
-        'session_code'
-    ).innerText =
-    opnameSession;
+    // document.getElementById(
+    //     'session_code'
+    // ).innerText =
+    // opnameSession + '(OPEN)';
+    updateSessionLabel('OPEN');
     refreshOpnameHistory();
 
 }else{
@@ -31,6 +29,85 @@ if(opnameSession){
                 </td>
             </tr>
     `;
+
+}
+
+function checkActiveSession(){
+
+  
+    fetch(
+        '/api/warehouse/stock-opname/active-session'
+    )
+
+    .then(res => res.json())
+
+    .then(data => {
+
+        if(data.session){
+          
+            opnameSession =
+                data.session.session_code;
+
+            document.getElementById(
+                'opnameForm'
+            ).style.display = 'block';
+
+            // document.getElementById(
+            //     'session_code'
+            // ).innerText =
+            // opnameSession;
+            updateSessionLabel('OPEN');
+
+            //btn 
+            document.getElementById(
+                'startBtn'
+            ).disabled = true;
+
+            document.getElementById(
+                'closeBtn'
+            ).disabled = false;
+
+            refreshOpnameHistory();
+
+        }else{
+            //btn
+            opnameSession = null;
+
+            document.getElementById(
+                'startBtn'
+            ).disabled = false;
+
+            document.getElementById(
+                'closeBtn'
+            ).disabled = true;
+            
+            document.getElementById(
+                'session_code'
+            ).innerText = '-';
+
+            let totalProducts =
+        document.getElementById(
+            'total_products'
+        ).value;
+
+        document.getElementById(
+            'counter'
+        ).innerText =
+        'Items Checked : 0/' + totalProducts;
+
+        document.getElementById(
+            'history_table'
+        ).innerHTML = `
+            <tr>
+                <td colspan="6" class="text-center">
+                    Stock Opname belum dimulai
+                </td>
+            </tr>
+        `;
+
+        }
+
+    });
 
 }
 
@@ -52,17 +129,17 @@ function startOpname(){
     opnameSession =
         'OPN-' + Date.now();
 
-    localStorage.setItem(
-        'opname_session',
-        opnameSession
-    );
+    // localStorage.setItem(
+    //     'opname_session',
+    //     opnameSession
+    // );
 
-    document.getElementById(
-        'session_code'
-    ).innerText =
-    opnameSession;
-        
-    console.log(opnameSession);
+    // document.getElementById(
+    //     'session_code'
+    // ).innerText =
+    // opnameSession + '(OPEN)';
+    updateSessionLabel('OPEN');
+    
 
     }
 
@@ -183,10 +260,23 @@ function refreshOpnameHistory(){
 
         data.forEach(item => {
 
+            // document.getElementById(
+            //     'counter'
+            // ).innerText =
+            // 'Items Checked : ' + data.length;
+
+            let totalProducts =
+                document.getElementById(
+                    'total_products'
+                ).value;
+
             document.getElementById(
                 'counter'
             ).innerText =
-            'Items Checked : ' + data.length;
+            'Items Checked : '
+            + data.length
+            + '/'
+            + totalProducts;
 
              let statusBadge = '';
 
@@ -320,13 +410,24 @@ function closeSession(){
 
         alert(data.message);
 
-        localStorage.removeItem(
-            'opname_session'
-        );
+        // localStorage.removeItem(
+        //     'opname_session'
+        // );
+
+        updateSessionLabel('CLOSED');
 
         location.reload();
 
     });
+
+}
+
+function updateSessionLabel(status){
+
+    document.getElementById(
+        'session_code'
+    ).innerText =
+    opnameSession + ' (' + status + ')';
 
 }
 
@@ -342,3 +443,6 @@ document.getElementById('scanner').addEventListener('keypress', function(e){
     }
 
 });
+
+refreshOpnameHistory();
+checkActiveSession();

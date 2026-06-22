@@ -26,7 +26,7 @@
 
         <div id="scan-status"></div>
 
-        <div class="card p-3">
+        <div class="card shadow p-3">
 
             <h5>Transaction Form</h5>
             <input type="hidden" id="transaction_id" value="">
@@ -60,18 +60,30 @@
     <div class="col-12 col-lg-8 mb-3">
         <div class="mb-3">
 
-            <label class="form-label">
-                Filter Tanggal
-            </label>
-
-            <input
+            <div class="card shadow p-3">
+                <label class="form-label ">
+                    Filter Tanggal
+                </label>
+                    <p>Tanggal Awal</p>
+                <input
                 type="date"
-                id="filter_date"
+                id="start_date"
+                class="form-control">
+                
+                <p class="mt-3">Tanggal Akhir</p>
+                <input
+                type="date"
+                id="end_date"
                 class="form-control">
 
+                <button class="btn btn-primary mt-3" onclick="loadHistory()">
+                    Filter
+                </button>
+            </div>
+            
         </div>
 
-        <div class="card p-3">
+        <div class="card shadow p-3">
 
             <h5>Transaction History</h5>
             <div class="table-responsive">

@@ -35,6 +35,16 @@
                 >
 
             </div>
+
+            @if(session('error'))
+
+                <div class="alert alert-danger">
+
+                    {{ session('error') }}
+
+                </div>
+
+            @endif
         
             <div class="col-md-4 mb-2">
 

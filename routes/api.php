@@ -34,6 +34,7 @@ Route::prefix('warehouse')->group(function(){
     //stock opname
     Route::get('/stock-opname/history',[StockOpnameController::class,'history']); //belum pakai
 
+    Route::get('/stock-opname/active-session',[StockOpnameController::class, 'activeSession']);
     //Route::post('/returns', [ReturnController::class, 'store']);
 
 });

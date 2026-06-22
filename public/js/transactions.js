@@ -165,8 +165,42 @@ function loadProducts(){
 
 function loadHistory(){
 
+    let startDate =
+        document.getElementById(
+            'start_date'
+        ).value;
+    let endDate =
+        document.getElementById(
+            'end_date'
+        ).value;
+    
+    if(
+        startDate &&
+        endDate &&
+        startDate > endDate
+    ){
+
+        alert(
+            'Start date cannot be greater than end date'
+        );
+
+        document.getElementById('start_date').value = '';
+        document.getElementById('end_date').value = '';
+
+        return;
+
+    }
+
     // mix default '/api/warehouse/transactions'
-    fetch('/api/warehouse/transactions?type=' + transactionType)  
+    //work tanpa filter fetch('/api/warehouse/transactions?type=' + transactionType)  
+    fetch(
+    '/api/warehouse/transactions?type='
+    + transactionType
+    + '&start_date='
+    + startDate
+    + '&end_date='
+    + endDate
+    )
     .then(res => res.json())
     .then(response => {
 

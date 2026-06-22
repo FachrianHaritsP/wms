@@ -16,6 +16,21 @@ class ReportController extends Controller
         $startDate = $request->start_date;
         $endDate = $request->end_date;
 
+        if(
+            $startDate &&
+            $endDate &&
+            $startDate > $endDate
+        ){
+
+            return redirect()
+                ->back()
+                ->with(
+                    'error',
+                    'Start date cannot be greater than end date'
+                );
+
+        }
+
         $filterDate = function ($query) use ($startDate, $endDate) {
 
             if($startDate && $endDate){

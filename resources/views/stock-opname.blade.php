@@ -8,6 +8,12 @@
         Stock Opname
     </h3>
 
+    <input
+    type="hidden"
+    id="total_products"
+    value="{{ \App\Models\Product::count() }}"
+    >
+
     <div class="row">
 
         {{-- Scan Card --}}
@@ -20,10 +26,10 @@
                     -
                 </span>
                 <div>
-                <button onclick="startOpname()" class="btn btn-primary md-3">
+                <button id="startBtn" onclick="startOpname()" class="btn btn-primary md-3">
                     Start Opname
                 </button>
-                <button onclick="closeSession()"
+                <button id="closeBtn" onclick="closeSession()"
                         class="btn btn-danger">
                     Close Session
                 </button>

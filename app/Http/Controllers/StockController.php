@@ -123,6 +123,21 @@ class StockController extends Controller
             );
         }
 
+        if(
+            $request->start_date &&
+            $request->end_date
+        ){
+
+            $query->whereBetween(
+                'created_at',
+                [
+                    $request->start_date,
+                    $request->end_date
+                ]
+            );
+
+        }
+
         $transactions = $query
                     ->latest()
                     ->paginate(10);
