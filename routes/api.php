@@ -33,6 +33,8 @@ Route::prefix('warehouse')
     ->middleware('auth:sanctum')
     ->group(function(){
 
+    //dashboard
+    Route::get('/dashboard', [DashboardController::class, 'index']);
     //product
     Route::get('/products',[ProductController::class, 'index']);
     Route::post('/products',[ProductController::class, 'store']);
@@ -45,8 +47,11 @@ Route::prefix('warehouse')
     Route::post('/stock-in', [StockController::class, 'stockIn']);
     Route::post('/stock-out', [StockController::class, 'stockOut']);
     Route::get('/transactions', [StockController::class, 'history']);
-    //dashboard
-    Route::get('/dashboard', [DashboardController::class, 'index']);
+    //return
+    Route::get('/returns', [ReturnController::class, 'apiIndex']);
+    Route::post('/returns', [ReturnController::class, 'store']);
+    Route::put('/returns/{id}', [ReturnController::class, 'update']);
+    Route::post('/returns/{id}/cancel', [ReturnController::class, 'cancel']);
     //stock opname
     Route::get('/stock-opname/history',[StockOpnameController::class,'history']); //belum pakai
     Route::get('/stock-opname/active-session',[StockOpnameController::class, 'activeSession']);

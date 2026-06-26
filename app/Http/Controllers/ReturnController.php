@@ -19,6 +19,7 @@ class   ReturnController extends Controller
     // 🔵 approve()   Web Only
     // 🔵 reject()    Web Only
 
+    //for web
     public function index()
     {
         $returns = ReturnItem::with(
@@ -41,6 +42,25 @@ class   ReturnController extends Controller
                 'products'
             )
         );
+    }
+
+    //for flutter
+    public function apiIndex()
+    {
+        $returns = ReturnItem::with(
+            'product',
+            'user'
+        )
+        ->latest()
+        ->paginate(10);
+
+        return response()->json([
+
+            'success' => true,
+            'message' => 'Returns fetched',
+            'data' => $returns
+
+        ]);
     }
 
     public function store(Request $request)
