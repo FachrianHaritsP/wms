@@ -11,6 +11,15 @@ use Illuminate\Support\Facades\Auth;
 class StockOpnameController extends Controller
 {  
 
+    //     StockOpnameController
+
+    // 🟢 activeSession()  READY
+    // 🔵 index()          WEB
+    // 🟢 data()           READY
+    // 🟢 store()          READY
+    // 🟢 history()        READY
+    // 🟢 closeSession()   READY
+
     public function activeSession()
     {
         $session = StockOpname::where(
@@ -164,7 +173,11 @@ class StockOpnameController extends Controller
             ->latest()
             ->get();
 
-        return response()->json($opnames);
+        //return response()->json($opnames);
+        return response()->json([
+            'success' => true,
+            'data' => $opname
+        ]);
     }
 
     public function closeSession(Request $request)

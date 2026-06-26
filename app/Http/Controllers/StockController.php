@@ -1,5 +1,5 @@
 <?php
-
+//ready but in update must add validation at update function
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;

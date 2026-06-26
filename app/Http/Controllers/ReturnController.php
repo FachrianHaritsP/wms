@@ -10,31 +10,14 @@ use App\Models\Product;
 class   ReturnController extends Controller
 {
     //returns
+    // 🟢 store()     API Ready
+    // 🟢 update()    API Ready
+    // 🟢 cancel()    API Ready
 
-    // public function index()
-    // {
-    //     $returns = ReturnItem::with('product','user')
-    //         ->latest()
-    //         ->paginate(10);
-            
-    //     return view('returns', compact('returns'));
-    // }
-
-    // public function index()
-    // {
-    //     $returns = ReturnItem::with(
-    //         'product',
-    //         'user'
-    //     )
-    //     ->where('status','pending')
-    //     ->latest()
-    //     ->paginate(10);
-
-    //     return view(
-    //         'returns',
-    //         compact('returns')
-    //     );
-    // }
+    // 🔵 index()     Web Only
+    // 🔵 review()    Web Only
+    // 🔵 approve()   Web Only
+    // 🔵 reject()    Web Only
 
     public function index()
     {

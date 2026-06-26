@@ -1,12 +1,11 @@
 <?php
-
+//API ready
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Product;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
-use function Laravel\Prompts\alert;
 
 class ScanController extends Controller
 {
@@ -29,7 +28,7 @@ class ScanController extends Controller
                 ->first();
 
         if(!$product){
-            alert('== Produk tidak ditemukan ==');
+
                 return response()->json([
                     'success' => false,
                     'message' => 'Product not found'
@@ -44,7 +43,7 @@ class ScanController extends Controller
     }
 
     
-
+    //web only
   public function generate($sku)
     {
         return QrCode::size(100)->generate($sku);
