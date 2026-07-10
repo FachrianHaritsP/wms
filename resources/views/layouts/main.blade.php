@@ -56,6 +56,8 @@
 
         <h4>WMS</h4>
 
+        <hr class="mt-9">
+
         {{-- menu nanti disini --}}
         {{-- DASHBOARD --}}
         @if(in_array(auth()->user()->role, ['owner', 'leader']))

@@ -75,33 +75,115 @@ function handleScan(sku){
 
 function stockIn(){
 
-    let product_id = document.getElementById('product_id').value;
-    let qty = document.getElementById('qty').value;
+    let product_id =
+        document.getElementById(
+            'product_id'
+        ).value;
 
-    ///api/warehouse/stock-in
-    fetch('/warehouse/stock-in', {
+    let qty =
+        document.getElementById(
+            'qty'
+        ).value;
 
-        method: 'POST',
+    let btn =
+        document.getElementById(
+            'btnStockIn'
+        );
 
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+    btn.disabled = true;
+    btn.innerText = 'Saving...';
+
+    if(product_id === ''){
+
+        alert('Produk wajib dipilih');
+
+        btn.disabled = false;
+        btn.innerText = 'Save Stock-In';
+
+        return;
+
+    }
+
+    if(qty === ''){
+
+        alert('Qty wajib diisi');
+
+        btn.disabled = false;
+        btn.innerText = 'Save Stock-In';
+
+        return;
+
+    }
+
+    if(parseInt(qty) <= 0){
+
+        alert('Qty harus lebih dari 0');
+
+        btn.disabled = false;
+        btn.innerText = 'Save Stock-In';
+
+        return;
+
+    }
+
+    fetch('/warehouse/stock-in',{
+
+        method:'POST',
+
+        headers:{
+
+            'Content-Type':'application/json',
+
+            'X-CSRF-TOKEN':
+            document.querySelector(
+                'meta[name="csrf-token"]'
+            ).content
+
         },
 
         body: JSON.stringify({
+
             product_id: product_id,
             qty: qty
+
         })
 
     })
 
     .then(res => res.json())
 
-    .then(() => {
-         //console.log(data);
+    .then(data => {
+
+        if(!data.success){
+
+            alert(data.message);
+
+            return;
+
+        }
+
+        alert(data.message);
+
         loadHistory();
 
         resetAfterTransaction();
+
+    })
+
+    .catch(err => {
+
+        console.log(err);
+
+        alert(
+            'Server tidak dapat dihubungi.'
+        );
+
+    })
+
+    .finally(() => {
+
+        btn.disabled = false;
+        btn.innerText = 'Save Stock-In';
 
     });
 
@@ -111,6 +193,40 @@ function stockOut(){
 
     let product_id = document.getElementById('product_id').value;
     let qty = document.getElementById('qty').value;
+    let btn =
+        document.getElementById(
+            'btnStockOut'
+        );
+
+    btn.disabled = true;
+    btn.innerText = 'Saving...';
+
+    if(product_id === ''){
+    alert('Produk wajib dipilih');
+
+    btn.disabled = false;
+    btn.innerText = 'Save Stock-Out';
+
+    return;
+    }
+
+    if(qty === ''){
+        alert('Qty wajib diisi');
+
+        btn.disabled = false;
+        btn.innerText = 'Save Stock-In';
+
+        return;
+    }
+
+    if(parseInt(qty) <= 0){
+        alert('Qty harus lebih dari 0');
+
+        btn.disabled = false;
+        btn.innerText = 'Save Stock-In';
+
+        return;
+    }
 
     fetch('/warehouse/stock-out', {
 
@@ -130,11 +246,34 @@ function stockOut(){
 
     .then(res => res.json())
 
-    .then(() => {
+    .then(data => {
 
+    if(!data.success){
+
+        alert(data.message);
+
+        return;
+
+    }
+
+        alert(data.message);
         loadHistory();
-
         resetAfterTransaction();
+
+    })
+    .catch(err => {
+
+    console.log(err);
+
+    alert(
+        'Server tidak dapat dihubungi.'
+    );
+
+    })
+    .finally(()=>{
+
+        btn.disabled = false;
+        btn.innerText = 'Save Stock-Out';
 
     });
 
@@ -191,8 +330,6 @@ function loadHistory(){
 
     }
 
-    // mix default '/api/warehouse/transactions'
-    //work tanpa filter fetch('/api/warehouse/transactions?type=' + transactionType)  
     fetch(
     '/api/warehouse/transactions?type='
     + transactionType
@@ -292,7 +429,14 @@ function startScanner(){
             html5QrCode.stop()
 
         }
-    )
+        ).catch(err=>{
+
+            console.log(err);
+
+            alert(err+' '+ console.log(navigator.mediaDevices)+' '+console.log(navigator.mediaDevices?.getUserMedia));
+
+    });
+    
 }
 
 function fillProductCardEdit(product){
@@ -331,12 +475,30 @@ function editTransaction(id){
     .value =
     transaction.qty;
 
+    if(transactionType === 'in'){
+
+        document.getElementById(
+            'btnStockIn'
+        ).innerText =
+        'Update Transaction';
+
+    }else{
+
+        document.getElementById(
+            'btnStockOut'
+        ).innerText =
+        'Update Transaction';
+
+    }
+
+    document.getElementById('qty').focus();
+
     fillProductCardEdit(transaction.product);
 }
 
 
 
-   function updateTransaction(){
+function updateTransaction(){
 
     let transaction_id =
         document.getElementById(
@@ -381,9 +543,7 @@ function editTransaction(id){
         }
 
     )
-
     .then(res => res.json())
-
     .then(data => {
 
         alert(data.message);
@@ -395,9 +555,66 @@ function editTransaction(id){
             'transaction_id'
         ).value = '';
 
+        if(transactionType === 'in'){
+
+            document.getElementById(
+                'btnStockIn'
+            ).innerText =
+            'Save Stock-In';
+
+        }else{
+
+            document.getElementById(
+                'btnStockOut'
+            ).innerText =
+            'Save Stock-Out';
+
+        }if(transactionType === 'in'){
+
+            document.getElementById(
+                'btnStockIn'
+            ).innerText =
+            'Save Stock-In';
+
+        }else{
+
+            document.getElementById(
+                'btnStockOut'
+            ).innerText =
+            'Save Stock-Out';
+
+        }
+
     });
 
+}
+
+function submitTransaction(){
+
+        let transactionId =
+        document.getElementById(
+            'transaction_id'
+        ).value;
+
+
+    if(transactionId){
+
+        updateTransaction();
+
+        return;
+
     }
+
+    if(transactionType === 'in'){
+
+        stockIn();
+
+    }else{
+
+        stockOut();
+    }
+
+}
 
 loadProducts()
 loadHistory()

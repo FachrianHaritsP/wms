@@ -55,5 +55,6 @@ Route::prefix('warehouse')
     //stock opname
     Route::get('/stock-opname/history',[StockOpnameController::class,'history']); //belum pakai
     Route::get('/stock-opname/active-session',[StockOpnameController::class, 'activeSession']);
+    Route::post('/stock-opname',[StockOpnameController::class, 'store']);
 
 });

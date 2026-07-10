@@ -2,12 +2,12 @@
 
 @section('content')
 <div class="table-responsive">
-    <h2 class="mt-2">Inventory</h2>
+    <h2 class="mt-2">Inventori</h2>
 
     <!--Search + Add -->
         <div class="d-flex flex-column flex-md-row justify-content-between gap-2 mb-3">
-            <input type="text" id="search" class="form-control" placeholder="Search SKU / Name">
-            <button class="btn btn-primary w-100" onclick="openAddModal()">Add Product</button>
+            <input type="text" id="search" class="form-control" placeholder="Cari SKU / Nama">
+            <button class="btn btn-primary w-100" onclick="openAddModal()">Tambah Produk</button>
         </div>
 
         {{-- tabel --}}
@@ -16,12 +16,12 @@
                 
                 <tr>
                     <th>SKU</th>
-                    <th>Name</th>
-                    <th class="d-none d-md-table-cell">Size</th>
-                    <th class="d-none d-md-table-cell">Color</th>
+                    <th>Nama</th>
+                    <th class="d-none d-md-table-cell">Ukuran</th>
+                    <th class="d-none d-md-table-cell">Warna</th>
                     <th>Stock</th>
-                    <th class="d-none d-md-table-cell">Location</th>
-                    <th>Action</th>
+                    <th class="d-none d-md-table-cell">Lokasi</th>
+                    <th>Aksi</th>
                     <th class="d-none d-md-table-cell">QR</th>
                 </tr>
                            
@@ -37,7 +37,7 @@
             <div class="modal-content">
 
                 <div class="modal-header">
-                    <h5 class="modal-title" id="modalTitle">Add Product</h5>
+                    <h5 class="modal-title" id="modalTitle">Tambah Produk</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
 
@@ -46,22 +46,27 @@
                     <input type="hidden" id="product_id">
 
                 <div class="mb-2">
+                    SKU
                     <input type="text" id="sku" class="form-control" placeholder="SKU">
                 </div>
 
                 <div class="mb-2">
+                    Nama
                     <input type="text" id="name" class="form-control" placeholder="Name">
                 </div>
 
                 <div class="mb-2">
+                    Ukuran
                     <input type="text" id="size" class="form-control" placeholder="Size">
                 </div>
 
                 <div class="mb-2">
+                    Warna
                     <input type="text" id="color" class="form-control" placeholder="Color">
                 </div>
 
                 <div class="mb-2">
+                    Stock
                     <input type="number" id="stock" class="form-control" placeholder="Stock">
                 </div>
 
@@ -100,7 +105,7 @@
             <div class="modal-content">
 
                 <div class="modal-header">
-                    <h5 class="modal-title">Delete Product</h5>
+                    <h5 class="modal-title">Hapus produk</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
 
@@ -111,7 +116,7 @@
 
                 <div class="modal-footer">
                     <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button class="btn btn-danger" onclick="confirmDelete()">Delete</button>
+                    <button id="btnDelete" class="btn btn-danger" onclick="confirmDelete()">Delete</button>
                 </div>
 
             </div>
@@ -130,7 +135,7 @@
                 <div class="modal-header">
 
                     <h5 class="modal-title">
-                        Product Detail
+                        Detail Produk
                     </h5>
 
                     <button type="button"
@@ -147,15 +152,15 @@
                         <span id="info_sku"></span>
                     </p>
 
-                    <p><b>Name:</b>
+                    <p><b>Nama:</b>
                         <span id="info_name"></span>
                     </p>
 
-                    <p><b>Size:</b>
+                    <p><b>Ukuran:</b>
                         <span id="info_size"></span>
                     </p>
 
-                    <p><b>Color:</b>
+                    <p><b>Warna:</b>
                         <span id="info_color"></span>
                     </p>
 
@@ -163,7 +168,7 @@
                         <span id="info_stock"></span>
                     </p>
 
-                    <p><b>Location:</b>
+                    <p><b>Lokasi:</b>
                         <span id="info_location"></span>
                     </p>
 

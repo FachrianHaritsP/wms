@@ -41,7 +41,23 @@
 
                 </thead>
                 <tbody>
-                    
+
+                    @if($pendingReturns->isEmpty())
+
+                        <tr>
+
+                            <td
+                            colspan="6"
+                            class="text-center">
+
+                            Tidak ada return yang menunggu approval.
+
+                            </td>
+
+                        </tr>
+
+                    @else
+
                     @foreach($pendingReturns as $return)
 
                         <tr>
@@ -64,11 +80,10 @@
 
                             <div class="d-flex gap-2">
 
-                               <form
-                                    action="/returns/{{ $return->id }}/approve"
-                                    method="POST"
-
-                                    onsubmit="return confirm('Yakin approve return ini?')">
+                            <form
+                                action="/returns/{{ $return->id }}/approve"
+                                method="POST"
+                                onsubmit="return disableSubmit(this, 'Processing...')">
 
                                     @csrf
                                     @method('PATCH')
@@ -81,9 +96,10 @@
                                     </button>
 
                                 </form>
-                                <form
-                                action="/returns/{{ $return->id }}/reject" method="POST"
-                                onsubmit="return confirm('Yakin reject return ini?')">
+                            <form
+                                action="/returns/{{ $return->id }}/reject"
+                                method="POST"
+                                onsubmit="return disableSubmit(this, 'Processing...')">
                                 @csrf
                                     @method('PATCH')
 
@@ -101,6 +117,10 @@
                         </tr>
 
                     @endforeach
+
+                    @endif
+                    
+                    
                 </tbody>
             </table>
 
@@ -132,7 +152,23 @@
         </thead>
 
          <tbody>
-            
+
+            @if($historyReturns ->isEmpty())
+
+            <tr>
+
+                <td
+                colspan="6"
+                class="text-center">
+
+                Tidak ada return yang menunggu approval.
+
+                </td>
+
+            </tr>
+
+            @else
+
             @foreach($historyReturns as $return)
                 <tr>
 
@@ -179,6 +215,9 @@
 
                 </tr>
             @endforeach
+
+            @endif
+            
         </tbody>
     </table>
 
@@ -190,5 +229,23 @@
     </div>
 
 </div>
+
+<script>
+
+function disableSubmit(form){
+
+    let btn =
+        form.querySelector('button');
+
+    btn.disabled = true;
+
+    btn.innerText = 'Processing...';
+
+    return true;
+
+}
+
+</script>
+
 
 @endsection

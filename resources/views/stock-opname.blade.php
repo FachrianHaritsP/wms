@@ -87,7 +87,7 @@
                         id="physical_stock"
                         class="form-control">
 
-                    <button onclick="saveOpname()"
+                    <button id="btnSaveOpname" onclick="saveOpname()"
                             class="btn btn-primary mt-3">
 
                         Save Opname

@@ -20,22 +20,15 @@
 
         <button class="btn btn-secondary mb-2" onclick="startScanner()">Scan QR</button>
 
-        <button  class="btn btn-primary mb-2" onclick="updateTransaction()">
-
-            Test Update
-
-        </button>
-
         <div class="card shadow p-3">
 
             <h5>Transaction Form</h5>
 
-            <!--<input type="number" id="product_id" class="form-control mb-2" placeholder="Product ID">
-            -->
             <input type="hidden" id="transaction_id">
-            <select id="product_id" class="form-control mb-2">
+            
+            {{-- <select id="product_id" class="form-control mb-2">
                 <option value="">==- Pilih Produk -==</option>
-            </select>
+            </select> --}}
 
             <p>SKU : <span id="product_sku"></span></p>
 
@@ -52,7 +45,7 @@
                 <input type="number" id="qty" class="form-control mb-2" placeholder="Qty">
             </div>
 
-            <button class="btn btn-danger w-100" onclick="stockOut()">Stock Out</button>
+            <button id="btnStockOut" class="btn btn-danger w-100" onclick="submitTransaction()">Save Stock-Out</button>
 
         </div>
 

@@ -27,12 +27,8 @@ class ProductController extends Controller
             $query->where('color', $request->color);
         }
     
-        //$product = $query->get(); work bawaan
         $products = $query->with('rackSlot.rack')->paginate(10); // ->get();
-        //$products = Product::with('rackSlot.rack')->get(); bug search tidak jalan klo pake ini
 
-
-        //return response()->json($products);//$query->get()
         return response()->json([
             'success' => true,
             'message' => 'Product fetched',
@@ -70,21 +66,18 @@ class ProductController extends Controller
 
     public function show($id)
     {
-        //$product = Product::find($id);
+
         $product = Product::with('rackSlot.rack')
             ->find($id);
 
         if(!$product){
-            /* return response()->json([
-                'message' => 'Product not found'
-            ], 404); */
+
             return response()->json([
             'success' => false,
             'message' => 'Product not found'
             ],404);
         }
 
-        //return response()->json($product);
         return response()->json([
             'success' => true,
             'message' => 'Product fetched',
@@ -94,7 +87,7 @@ class ProductController extends Controller
 
     public function update(Request $request, $id)
     {
-        //$product = Product::find($id);
+
         $product = Product::with('rackSlot.rack')
             ->find($id);
 
@@ -107,9 +100,7 @@ class ProductController extends Controller
         ]);
 
         if(!$product){
-            /* return response()->json([
-                'message' => 'Product not found'
-            ], 404); */
+
             return response()->json([
             'success' => false,
             'message' => 'Product not found'
@@ -125,10 +116,6 @@ class ProductController extends Controller
             'rack_slot_id' => $request->rack_slot_id,
         ]);
 
-       /*  return response()->json([
-            'message' => 'Product updated',
-            'data' => $product
-        ]); */
         return response()->json([
         'success' => true,
         'message' => 'Product updated',
@@ -143,9 +130,7 @@ class ProductController extends Controller
         $product = Product::find($id);
 
         if(!$product){
-            /* return response()->json([
-                'message' => 'Product not found'
-            ], 404); */
+
             return response()->json([
             'success' => false,
             'message' => 'Product not found'
@@ -154,9 +139,7 @@ class ProductController extends Controller
 
         $product->delete();
 
-       /*  return response()->json([
-            'message' => 'Product deleted'
-        ]); */
+
         return response()->json([
         'success' => true,
         'message' => 'Delete success',

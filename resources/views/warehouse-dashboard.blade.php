@@ -7,9 +7,9 @@
 <div class="container-fluid">
     <h2 class="mt-3"> Dashboard</h2>
     <select id="period_filter" onchange="loadDashboard()">
-        <option value="today">Today</option>
-        <option value="week">This Week</option>
-        <option value="month">This Month</option>
+        <option value="today">Hari Ini</option>
+        <option value="week">Satu Minggu</option>
+        <option value="month">Satu Bulan</option>
     </select>
 
     <!-- bungkus -->
@@ -42,7 +42,7 @@
             <div class="col-md-3">
             <div class="card shadow">
             <div class="card-body">
-            <h6>Stock In</h6>
+            <h6>Stok Masuk</h6>
             <h3 id="stock_in"></h3>
             </div>
             </div>
@@ -51,7 +51,7 @@
             <div class="col-md-3">
             <div class="card shadow">
             <div class="card-body">
-            <h6>Stock Out</h6>
+            <h6>Stock Keluar</h6>
             <h3 id="stock_out"></h3>
             </div>
             </div>
@@ -63,15 +63,15 @@
         <!-- Low Stock Table -->
         <div class="container-fluid mt-4">
 
-        <h4>Low Stock Alert</h4>
+        <h4>Stok Rendah</h4>
 
             <table class="table table-bordered table-striped">
 
             <thead class="table-danger">
             <tr>
             <th>SKU</th>
-            <th>Name</th>
-            <th>Stock</th>
+            <th>Nama</th>
+            <th>Stok</th>
             </tr>
             </thead>
 
@@ -88,12 +88,12 @@
             <div class="row">
 
                 <div class="col-md-6">
-                <h5>Product Movement</h5>
+                <h5>Pergerakan Produk</h5>
                 <canvas id="productChart"></canvas>
                 </div>
 
                 <div class="col-md-6">
-                <h5>Stock Movement</h5>
+                <h5>Pergerakan Stok</h5>
                 <canvas id="stockChart"></canvas>
                 </div>
 

@@ -176,7 +176,7 @@ class StockOpnameController extends Controller
         //return response()->json($opnames);
         return response()->json([
             'success' => true,
-            'data' => $opname
+            'data' => $opnames
         ]);
     }
 

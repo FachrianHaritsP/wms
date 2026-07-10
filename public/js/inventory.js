@@ -4,7 +4,7 @@ function loadProducts(page = 1, search = ''){
 
     table.innerHTML ='<tr><td colspan="8" class="text-center">Loading...</td></tr>';
 
-    //fetch('/api/warehouse/products?search=' + search)
+  
     fetch('/api/warehouse/products?page='+ page +'&search=' + search)
 
     .then(res => res.json())
@@ -43,7 +43,7 @@ function loadProducts(page = 1, search = ''){
                 </td>
 
                 <td>
-                    <button class="btn btn-warning btn-sm"
+                    <button class="btn btn-warning btn-sm mt-1"
                     onclick="openEditModal(${item.id})">
                     ✏ Edit
                     </button>
@@ -88,8 +88,26 @@ function loadProducts(page = 1, search = ''){
         });
 
         if(data.length === 0){
-            table.innerHTML = '<tr><td colspan="6">No data found</td></tr>';
-        } 
+
+            table.innerHTML = `
+
+            <tr>
+
+                <td
+                    colspan="8"
+                    class="text-center text-muted py-4">
+
+                    Belum ada produk.
+
+                </td>
+
+            </tr>
+
+            `;
+
+            return;
+
+        }
 
     });
 
@@ -97,9 +115,10 @@ function loadProducts(page = 1, search = ''){
 
 function openAddModal(){
 
-    document.getElementById('modalTitle').innerText = 'Add Product'
+    document.getElementById('modalTitle').innerText = 'Tambah Produk'
+    document.getElementById('sku').focus();
 
-    document.getElementById('product_id').value = ''
+    document.getElementById('product_id').value = ''   
     document.getElementById('sku').value = ''
     document.getElementById('name').value = ''
     document.getElementById('size').value = ''
@@ -112,44 +131,116 @@ function openAddModal(){
 
 function saveProduct(){
 
-    let id = document.getElementById('product_id').value
+    let id = document.getElementById('product_id').value;
+
+    let sku = document.getElementById('sku').value.trim();
+    let name = document.getElementById('name').value.trim();
+    let size = document.getElementById('size').value;
+    let color = document.getElementById('color').value;
+    let stock = document.getElementById('stock').value;
+    let rack_slot_id = document.getElementById('rack_slot_id').value;
+
+    // VALIDASI
+    if(sku === ''){
+        alert('SKU wajib diisi');
+        return;
+    }
+
+    if(name === ''){
+        alert('Nama produk wajib diisi');
+        return;
+    }
+
+    if(size === ''){
+        alert('Ukuran produk wajib diisi');
+        return;
+    }
+
+    if(color === ''){
+        alert('Warna produk wajib diisi');
+        return;
+    }
+
+    if(stock === ''){
+        alert('Stock wajib diisi');
+        return;
+    }
+
+    if(parseInt(stock) < 0){
+        alert('Stock tidak boleh negatif');
+        return;
+    }
 
     let data = {
-        sku: document.getElementById('sku').value,
-        name: document.getElementById('name').value,
-        size: document.getElementById('size').value,
-        color: document.getElementById('color').value,
-        stock: document.getElementById('stock').value,
-        rack_slot_id: document.getElementById('rack_slot_id').value,
-    }
+        sku: sku,
+        name: name,
+        size: size,
+        color: color,
+        stock: stock,
+        rack_slot_id: rack_slot_id,
+    };
 
-    let url = '/api/warehouse/products'
-    let method = 'POST'
+    let url = '/api/warehouse/products';
+    let method = 'POST';
 
     if(id){
-        url += '/' + id
-        method = 'PUT'
+        url += '/' + id;
+        method = 'PUT';
     }
 
-    fetch(url, {
+    fetch(url,{
+
         method: method,
-        headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
 
-            'X-CSRF-TOKEN':document.querySelector(
-            'meta[name="csrf-token"]'
-        ).content
+        headers:{
+            'Content-Type':'application/json',
+            'Accept':'application/json',
+
+            'X-CSRF-TOKEN':
+            document.querySelector(
+                'meta[name="csrf-token"]'
+            ).content
         },
+
         body: JSON.stringify(data)
+
     })
+
     .then(res => res.json())
-    .then(() => {
 
-        bootstrap.Modal.getInstance(document.getElementById('productModal')).hide()
-        loadProducts()
+    .then(data => {
+
+        if(!data.success){
+
+            alert(data.message);
+            return;
+
+        }
+
+        bootstrap.Modal
+            .getInstance(
+                document.getElementById(
+                    'productModal'
+                )
+            )
+            .hide();
+
+        loadProducts();
+
+        alert(data.message);
 
     })
+
+    .catch(err => {
+
+        console.log(err);
+
+        alert(
+            'Server tidak dapat dihubungi.'
+        );
+
+    });
+
 }//end
 
 function openEditModal(id){
@@ -159,7 +250,7 @@ function openEditModal(id){
     .then(response => {
         let data = response.data
 
-        document.getElementById('modalTitle').innerText = 'Edit Product'
+        document.getElementById('modalTitle').innerText = 'Edit Produk'
 
         document.getElementById('product_id').value = data.id
         document.getElementById('sku').value = data.sku
@@ -223,6 +314,82 @@ function openDeleteModal(id){
 
     new bootstrap.Modal(document.getElementById('deleteModal')).show()
 }//end
+
+function confirmDelete(){
+
+    let id =
+        document.getElementById(
+            'delete_id'
+        ).value;
+
+    let btn =
+        document.getElementById(
+            'btnDelete'
+        );
+
+    btn.disabled = true;
+    btn.innerText = 'Deleting...';
+
+    fetch('/api/warehouse/products/' + id,{
+
+        method:'DELETE',
+
+        headers:{
+
+            'Accept':'application/json',
+
+            'X-CSRF-TOKEN':
+            document.querySelector(
+                'meta[name="csrf-token"]'
+            ).content
+
+        }
+
+    })
+
+    .then(res => res.json())
+
+    .then(data => {
+
+        if(!data.success){
+
+            alert(data.message);
+            return;
+
+        }
+
+        bootstrap.Modal
+            .getInstance(
+                document.getElementById(
+                    'deleteModal'
+                )
+            )
+            .hide();
+
+        loadProducts();
+
+        alert(data.message);
+
+    })
+
+    .catch(err => {
+
+        console.log(err);
+
+        alert(
+            'Server tidak dapat dihubungi.'
+        );
+
+    })
+
+    .finally(() => {
+
+        btn.disabled = false;
+        btn.innerText = 'Delete';
+
+    });
+
+}
 
 
 document.addEventListener('DOMContentLoaded', function(){

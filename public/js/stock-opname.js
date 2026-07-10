@@ -166,7 +166,6 @@ function scanProduct(){
 
         // ambil product
         let product = data.data;
-        //console.log(product);
 
         // set hidden id
         document.getElementById('product_id').value = product.id;
@@ -177,7 +176,6 @@ function scanProduct(){
         document.getElementById('product_stock').innerText = product.stock;
         document.getElementById('product_location').innerText =  document.getElementById('product_location').innerText = product.rack_slot.rack.rack_code + ' - ' + product.rack_slot.slot_code;//product.rack + ' - ' + product.slot; 
 
-        //console.log(product.rack_slot.rack);
     })
 
     .catch(err => {
@@ -195,6 +193,15 @@ function saveOpname(){
 
     let product_id = document.getElementById('product_id').value;
     let physical_stock = document.getElementById('physical_stock').value;
+
+
+    let btn =
+        document.getElementById(
+            'btnSaveOpname'
+        );
+
+    btn.disabled = true;
+    btn.innerText = 'Saving...';
 
     fetch('/stock-opname', {
 
@@ -236,6 +243,12 @@ function saveOpname(){
 
         alert('Terjadi error : ' + err);
 
+    })
+    .finally(()=>{
+
+        btn.disabled = false;
+        btn.innerText = 'Save Opname';
+
     });
 
 }
@@ -245,11 +258,10 @@ function refreshOpnameHistory(){
     fetch(
     '/api/warehouse/stock-opname/history?session_code='
     + opnameSession)
-    //fetch('/api/warehouse/stock-opname/history')
 
     .then(res => res.json())
 
-    .then(data => {
+    .then(result => {
 
         let table =
             document.getElementById(
@@ -258,12 +270,7 @@ function refreshOpnameHistory(){
 
         table.innerHTML = '';
 
-        data.forEach(item => {
-
-            // document.getElementById(
-            //     'counter'
-            // ).innerText =
-            // 'Items Checked : ' + data.length;
+        result.data.forEach(item => {
 
             let totalProducts =
                 document.getElementById(
@@ -274,7 +281,7 @@ function refreshOpnameHistory(){
                 'counter'
             ).innerText =
             'Items Checked : '
-            + data.length
+            + result.data.length
             + '/'
             + totalProducts;
 
@@ -367,8 +374,8 @@ function openCamera(){
 
         (errorMessage) => {
 
-            // optional ignore
-            console.log(errorMessage);
+   
+            console.log(errorMessage+' '+ console.log(navigator.mediaDevices)+' '+console.log(navigator.mediaDevices?.getUserMedia));
 
         }
 
@@ -377,6 +384,13 @@ function openCamera(){
 }
 
 function closeSession(){
+    let btn =
+        document.getElementById(
+            'closeBtn'
+        );
+
+    btn.disabled = true;
+    btn.innerText = 'Saving...';
 
     fetch(
         '/stock-opname/close',
@@ -410,13 +424,15 @@ function closeSession(){
 
         alert(data.message);
 
-        // localStorage.removeItem(
-        //     'opname_session'
-        // );
-
         updateSessionLabel('CLOSED');
 
         location.reload();
+
+    })
+    .finally(()=>{
+
+        btn.disabled = false;
+        btn.innerText = 'Close Opname';
 
     });
 

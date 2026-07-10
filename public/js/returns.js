@@ -53,6 +53,14 @@ function submitReturn() {
     let qty = document.getElementById('qty').value;
     let reason = document.getElementById('reason').value;
     let notes = document.getElementById('notes').value;
+    let btn =
+        document.getElementById(
+            'submitBtn'
+        );
+
+    btn.disabled = true;
+    btn.innerText = 'Saving...';
+
 
     if(editingReturnId){
 
@@ -66,6 +74,34 @@ function submitReturn() {
 
     return;
     }   
+
+    if(productId === ''){
+        alert('Produk wajib dipilih');
+        btn.disabled = false;
+        btn.innerText = 'Submit Return';
+        return;
+    }
+
+    if(qty === ''){
+        alert('Qty wajib diisi');
+        btn.disabled = false;
+        btn.innerText = 'Submit Return';
+        return;
+    }
+
+    if(parseInt(qty) <= 0){
+        alert('Qty harus lebih dari 0');
+        btn.disabled = false;
+        btn.innerText = 'Submit Return';
+        return;
+    }
+
+    if(reason.trim() === ''){
+        alert('Reason wajib diisi');
+        btn.disabled = false;
+        btn.innerText = 'Submit Return';
+        return;
+    }
 
     fetch('/returns', {
         method: 'POST',
@@ -86,23 +122,41 @@ function submitReturn() {
     .then(res => res.json())//.then(res => res.json())
     .then(data => { //data => work ; async res=> buat tet
 
-        //let data = response.data; //work
-        //let text = await res.text();
         console.log(data);
 
-        if(data.success){
-            alert('Return berhasil ditambahkan');
-             // reset form
-            resetCard();
-            //loadReturns(); blm buat
-            location.reload();
+        if(!data.success){
+
+            alert(data.message);
+
+            return;
+
         }
+
+        alert(data.message);
+        resetCard();
+        loadReturns();
+        //location.reload();
+
+
+        // if(data.success){
+        //     alert('Return berhasil ditambahkan');
+        //      // reset form
+        //     resetCard();
+        //     //loadReturns(); blm buat
+        //     location.reload();
+        // }
        
         
     })
     .catch(err => {
         console.log(err);
-        alert('Terjadi error');
+        alert('Server tidak dapat dihubungi. atau\n' + ' '+err)
+    })
+    .finally(()=>{
+
+        btn.disabled = false;
+        btn.innerText = 'Submit Return';
+
     });
 
 }
@@ -113,7 +167,15 @@ function updateReturn(
     qty,
     reason,
     notes
-){
+    ){
+
+    let btn =
+        document.getElementById(
+            'submitBtn'
+        );
+
+    btn.disabled = true;
+    btn.innerText = 'Saving...';    
 
     fetch(
 
@@ -151,6 +213,14 @@ function updateReturn(
 
     .then(data => {
 
+        if(!data.success){
+
+            alert(data.message);
+
+            return;
+
+        }
+
         alert(
             data.message
         );
@@ -159,23 +229,25 @@ function updateReturn(
 
         resetCard();
 
-        //loadReturns(); blm buat
-        location.reload();
+        loadReturns(); 
 
-        document.getElementById(
-            'submitBtn'
-        ).innerText =
-        'Submit Return';
 
     })
-
-    .catch(err => {
+    .catch(err => { 
 
         console.log(err);
+        alert('Server tidak dapat dihubungi. atau\n' + ' '+err);
 
-        alert(
-            'Terjadi error'
+    })
+    .finally(()=>{
+
+    let btn =
+        document.getElementById(
+            'submitBtn'
         );
+
+    btn.disabled = false;
+    btn.innerText = 'Submit Return';
 
     });
 
@@ -192,7 +264,9 @@ function cancelReturn(id){
     }
 
     fetch(
+
         '/returns/' + id + '/cancel',
+
         {
 
             method:'POST',
@@ -216,9 +290,17 @@ function cancelReturn(id){
 
     .then(data => {
 
+        if(!data.success){
+
+            alert(data.message);
+
+            return;
+
+        }
+
         alert(data.message);
 
-        location.reload();
+        loadReturns();
 
     })
 
@@ -226,7 +308,9 @@ function cancelReturn(id){
 
         console.log(err);
 
-        alert('Terjadi error');
+        alert(
+            'Server tidak dapat dihubungi.'
+        );
 
     });
 
