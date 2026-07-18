@@ -9,7 +9,7 @@ function resetCard(){
 
 function loadReturns(){
 
-    fetch('/returns/data')
+    fetch('/returns')
 
     .then(res => res.json())
 
@@ -135,17 +135,6 @@ function submitReturn() {
         alert(data.message);
         resetCard();
         loadReturns();
-        //location.reload();
-
-
-        // if(data.success){
-        //     alert('Return berhasil ditambahkan');
-        //      // reset form
-        //     resetCard();
-        //     //loadReturns(); blm buat
-        //     location.reload();
-        // }
-       
         
     })
     .catch(err => {

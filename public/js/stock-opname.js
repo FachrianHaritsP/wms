@@ -8,10 +8,6 @@ if(opnameSession){
         'opnameForm'
     ).style.display = 'block';
 
-    // document.getElementById(
-    //     'session_code'
-    // ).innerText =
-    // opnameSession + '(OPEN)';
     updateSessionLabel('OPEN');
     refreshOpnameHistory();
 
@@ -33,8 +29,7 @@ if(opnameSession){
 }
 
 function checkActiveSession(){
-
-  
+ 
     fetch(
         '/api/warehouse/stock-opname/active-session'
     )
@@ -52,10 +47,7 @@ function checkActiveSession(){
                 'opnameForm'
             ).style.display = 'block';
 
-            // document.getElementById(
-            //     'session_code'
-            // ).innerText =
-            // opnameSession;
+
             updateSessionLabel('OPEN');
 
             //btn 
@@ -113,12 +105,11 @@ function checkActiveSession(){
 
 function refreshFill(){
     document.getElementById('physical_stock').value = '';
-    document.getElementById('scanner').value = '';
+    document.getElementById('product_id_drop').value= '';
     document.getElementById('product_sku').innerText = '';
     document.getElementById('product_name').innerText = '';
     document.getElementById('product_stock').innerText = '';
     document.getElementById('product_location').innerText = ''; 
-    document.getElementById('scanner').focus();
 }
 
 function startOpname(){
@@ -129,15 +120,6 @@ function startOpname(){
     opnameSession =
         'OPN-' + Date.now();
 
-    // localStorage.setItem(
-    //     'opname_session',
-    //     opnameSession
-    // );
-
-    // document.getElementById(
-    //     'session_code'
-    // ).innerText =
-    // opnameSession + '(OPEN)';
     updateSessionLabel('OPEN');
     
 
@@ -150,13 +132,10 @@ function startOpname(){
 
 
 // scan product
-function scanProduct(){
+function scanProduct(sku){
 
-    
-    let scanner = document.getElementById('scanner').value;
-    //console.log(scanner);
 
-    fetch('warehouse/scan/' + scanner)
+    fetch('warehouse/scan/' + sku) //scanner
 
     .then(res => res.json())
 
@@ -187,6 +166,45 @@ function scanProduct(){
     });
 
 }
+
+
+// function scanProduct(){
+
+    
+//     //let scanner = document.getElementById('scanner').value;
+//     let product_id = document.getElementById('product_id').value;
+
+//     fetch('warehouse/scan/' + product_id) //scanner
+
+//     .then(res => res.json())
+
+//     .then(data => {
+
+//         console.log(data);
+
+//         // ambil product
+//         let product = data.data;
+
+//         // set hidden id
+//         document.getElementById('product_id').value = product.id;
+
+//         // tampil info
+//         document.getElementById('product_sku').innerText = product.sku;
+//         document.getElementById('product_name').innerText = product.name;
+//         document.getElementById('product_stock').innerText = product.stock;
+//         document.getElementById('product_location').innerText =  document.getElementById('product_location').innerText = product.rack_slot.rack.rack_code + ' - ' + product.rack_slot.slot_code;//product.rack + ' - ' + product.slot; 
+
+//     })
+
+//     .catch(err => {
+
+//         console.log(err);
+
+//         alert('Product tidak ditemukan');
+
+//     });
+
+// }
 
 
 function saveOpname(){
@@ -360,13 +378,8 @@ function openCamera(){
 
             console.log(decodedText);
 
-            // isi textbox
-            document.getElementById('scanner').value =
-                decodedText;
-
             // auto scan product
-            scanProduct();
-
+            scanProduct(decodedText);
             // stop camera setelah berhasil
             html5QrCode.stop();
 
@@ -447,18 +460,71 @@ function updateSessionLabel(status){
 
 }
 
-// detect enter scanner
-document.getElementById('scanner').addEventListener('keypress', function(e){
+//dropbox load
+function loadProducts(){
 
-    if(e.key === 'Enter'){
+    fetch('/api/warehouse/products')
 
-        e.preventDefault();
+    .then(res => res.json())
 
-        scanProduct();
+    .then(response => {
 
-    }
+        let data = response.data.data;
 
-});
+        let select =
+            document.getElementById('product_id_drop');
 
+        select.innerHTML =
+            '<option value="">-- Pilih Produk --</option>';
+
+        data.forEach(item => {
+
+            select.innerHTML += `
+                <option value="${item.id}">
+                    ${item.name} - ${item.color} - ${item.size}
+                </option>
+            `;
+
+        });
+
+    });
+
+}
+
+function loadProductDetail(id){
+    fetch('/api/warehouse/products/' + id)
+
+    .then(res => res.json())
+
+    .then(data => {
+
+        let product = data.data;
+  
+        document.getElementById('product_sku').innerText = product.sku;
+        document.getElementById('product_name').innerText = product.name;
+        document.getElementById('product_stock').innerText = product.stock;
+        document.getElementById('product_location').innerText =
+        product.rack_slot?.rack?.rack_code + ' - ' + product.rack_slot?.slot_code;
+
+    });
+}
+
+
+function selectProduct(){
+
+    let id =
+        document.getElementById(
+            'product_id_drop'
+        ).value;
+
+    document.getElementById(
+        'product_id'
+    ).value = id;
+
+    loadProductDetail(id);
+
+}
+
+loadProducts();
 refreshOpnameHistory();
 checkActiveSession();

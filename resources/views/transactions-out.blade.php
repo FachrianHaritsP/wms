@@ -25,11 +25,8 @@
             <h5>Transaction Form</h5>
 
             <input type="hidden" id="transaction_id">
+            <input type="hidden" id="product_id" value="">
             
-            {{-- <select id="product_id" class="form-control mb-2">
-                <option value="">==- Pilih Produk -==</option>
-            </select> --}}
-
             <p>SKU : <span id="product_sku"></span></p>
 
             <p>Size : <span id="product_size"></span></p>

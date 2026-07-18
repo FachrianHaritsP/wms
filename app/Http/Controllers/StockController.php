@@ -22,9 +22,6 @@ class StockController extends Controller
         ]);
 
         if(!$product){
-           /*  return response()->json([
-                'message' => 'Product not found'
-            ],404); */
             return response()->json([
             'success' => false,
             'message' => 'Product not found'
@@ -40,7 +37,6 @@ class StockController extends Controller
             'qty' => $request->qty,
             'created_by' => Auth::id()
         ]);
-
 
         try
         {
@@ -140,8 +136,7 @@ class StockController extends Controller
 
         $transactions = $query
                     ->latest()
-                    ->paginate(10);
-                    //->get();    
+                    ->paginate(10); 
 
         return response()->json([
             'success'=>true,

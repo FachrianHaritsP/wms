@@ -37,19 +37,20 @@
             <div id="opnameForm" style="display:none;">
                 <div class="card p-2">
                     <div class="mb-3">
-                        <label class="mb-2">
-                        Scan QR
-                        </label>
-                        
-                        <input type="text" id="scanner" class="form-control" placeholder="Scan QR Product">
                         <input type="hidden" id="product_id">
-                        <button onclick="scanProduct()" class="btn btn-success mt-3">
-
-                            Search Product
-
-                        </button>
+                        {{-- <input type="hidden" id="scanner"> --}}
                     </div>
                     <div class="mb-3">
+                        <label class="mb-2">
+                           Cari Produk
+                        </label>
+
+                        <select id="product_id_drop" class="form-select" onchange="selectProduct()">
+                            <option value="">-- Pilih Produk --</option>
+                        </select>
+                    </div>
+                    -- Atau --
+                    <div class="mt-3">
                         <button onclick="openCamera()" class="btn btn-success mt-2">
                             Open Camera
                         </button>

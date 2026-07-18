@@ -279,28 +279,6 @@ function stockOut(){
 
 }
 
-function loadProducts(){
-
-    fetch('/api/warehouse/products')
-    .then(res => res.json())
-    .then(response => {
-
-        let data = response.data.data;
-
-        let select = document.getElementById('product_id')
-
-        data.forEach(item => {
-
-            select.innerHTML += `
-            <option value="${item.id}">
-                ${item.name} - ${item.color} - ${item.size}
-            </option>
-            `
-        })
-
-    })
-
-}
 
 function loadHistory(){
 
@@ -616,5 +594,4 @@ function submitTransaction(){
 
 }
 
-loadProducts()
 loadHistory()
