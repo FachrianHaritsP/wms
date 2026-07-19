@@ -11,6 +11,13 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\ReturnController;
 use Illuminate\Support\Facades\auth;
 
+
+// Route::get('/token-test', function (Request $request) {
+//     return response()->json([
+//         'authorization' => $request->header('Authorization'),
+//     ]);
+// });
+
 //authflutter
 Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')
@@ -54,7 +61,11 @@ Route::prefix('warehouse')
     Route::post('/returns/{id}/cancel', [ReturnController::class, 'cancel']);
     //stock opname
     Route::get('/stock-opname/history',[StockOpnameController::class,'history']); //belum pakai
-    Route::get('/stock-opname/active-session',[StockOpnameController::class, 'activeSession']);
+    //Route::get('/stock-opname/active-session',[StockOpnameController::class, 'activeSession']); mau dibuang
     Route::post('/stock-opname',[StockOpnameController::class, 'store']);
+    //stock opnmae logic baru
+    Route::post('/stock-opname/start', [StockOpnameController::class, 'startSession']);
+    Route::post('/stock-opname/close', [StockOpnameController::class, 'closeSession']);
+    Route::get('/stock-opname/active', [ StockOpnameController::class, 'activeSession']);
 
 });

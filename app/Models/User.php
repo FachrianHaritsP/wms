@@ -48,5 +48,10 @@ class User extends Authenticatable
         ];
     }
 
+    public function stockOpnameSessions()
+    {
+        return $this->hasMany(StockOpnameSession::class, 'created_by');
+    }
+
 
 }

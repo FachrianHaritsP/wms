@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Models\ReturnItem;
 use App\Models\Product;
 use Illuminate\Support\Facades\Auth;
+use App\Models\StockOpnameSession;
+use App\Models\StockOpnameDetail;
 
 class StockOpnameController extends Controller
 {  
@@ -20,18 +22,54 @@ class StockOpnameController extends Controller
     // 🟢 history()        READY
     // 🟢 closeSession()   READY
 
+    public function startSession()
+    {
+        $active = StockOpnameSession::where('status', 'open')
+            ->latest()
+            ->first();
+
+        if ($active) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Masih ada session yang aktif.',
+                'data' => $active
+            ], 400);
+        }
+
+        $session = StockOpnameSession::create([
+            'session_code' => 'OPN-' . time(),
+            'status' => 'open',
+            'created_by' => Auth::id(),
+            'started_at' => now(),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Session berhasil dibuat.',
+            'data' => $session
+        ]);
+    }
+
     public function activeSession()
     {
-        $session = StockOpname::where(
-            'session_status',
-            'open'
-        )
+
+        $session = StockOpnameSession::where('status', 'open')
         ->latest()
         ->first();
 
+          if (!$session) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Tidak ada session aktif.'
+            ], 404);
+        }
+
+
         return response()->json([
-            'session' => $session
+            'success' => true,
+            'data' => $session
         ]);
+
     }
 
     public function index()
@@ -45,9 +83,7 @@ class StockOpnameController extends Controller
                 ->whereIn('status',['pending','rejected'])
                 ->latest()
                 ->get();
-    
-    //$totalChecked = StockOpname::count(); // jika ambil dari database tapi belum buat ..
-    return view('stock-opname', compact('opnames','returns')); // 'totalChecked' jika ambil dari db tambahkan ini
+    return view('stock-opname', compact('opnames','returns')); 
 
     }
 
@@ -73,73 +109,57 @@ class StockOpnameController extends Controller
             $request->product_id
         );
 
-    //btn
-    $session = StockOpname::where(
-    'session_code',
-    $request->session_code
+        $session = StockOpnameSession::where('status', 'open')
+            ->latest()
+            ->first();
+
+        if (!$session) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Tidak ada session stock opname yang aktif.'
+            ], 400);
+        }
+
+
+        $system = $product->stock;
+        $physical = $request->physical_stock;
+        $difference = $physical - $system;
+
+        $status = $difference == 0
+            ? 'match'
+            : 'discrepancy';
+
+        $existing = StockOpnameDetail::where(
+        'session_id',
+        $session->id
+        )
+        ->where(
+            'product_id',
+            $product->id
         )
         ->first();
 
-        if(
-            $session &&
-            $session->session_status === 'closed'
-        ){
-
-            return response()->json([
-
-                'success' => false,
-                'message' => 'Session already closed'
-
-            ], 400);
-
-        }
-
-    $system = $product->stock;
-    $physical = $request->physical_stock;
-    $difference = $physical - $system;
-
-    $status = $difference == 0
-        ? 'match'
-        : 'discrepancy';
-
-    $existing = StockOpname::where(
-        'session_code',
-        $request->session_code
-    )
-    ->where(
-        'product_id',
-        $product->id
-    )
-    ->first();
-
-    if($existing){
+        if($existing){
 
         $existing->update([
-
             'system_stock' => $system,
             'physical_stock' => $physical,
             'difference' => $difference,
-            'status' => $status,
-            'session_status' => 'open',
-
+            'match_status' => $status,
         ]);
 
         $opname = $existing;
 
     }else{
 
-        $opname = StockOpname::create([
+        $opname = StockOpnameDetail::create([
 
-        'product_id' => $product->id,
-        'system_stock' => $system,
-        'physical_stock' => $physical,
-        'difference' => $difference,
-        'status' => $status,
-
-        'session_code' => $request->session_code,
-        'session_status' => 'open',
-
-        'created_by' => Auth::id()
+            'session_id' => $session->id,
+            'product_id' => $product->id,
+            'system_stock' => $system,
+            'physical_stock' => $physical,
+            'difference' => $difference,
+            'match_status' => $status,
 
         ]);
 
@@ -155,12 +175,12 @@ class StockOpnameController extends Controller
 
     public function history(Request $request)
     {
-        $query = StockOpname::with(
-            'product',
-            'user'
-        );
+        $query = StockOpnameSession::with([
+            'user',
+            'details.product'
+        ]);
 
-        if($request->session_code){
+        if ($request->session_code) {
 
             $query->where(
                 'session_code',
@@ -169,36 +189,50 @@ class StockOpnameController extends Controller
 
         }
 
-        $opnames = $query
+        $sessions = $query
             ->latest()
             ->get();
 
-        //return response()->json($opnames);
         return response()->json([
             'success' => true,
-            'data' => $opnames
+            'data' => $sessions
         ]);
     }
 
     public function closeSession(Request $request)
     {
-        StockOpname::where(
-            'session_code',
-            $request->session_code
-        )
-        ->update([
+ 
+        $session = StockOpnameSession::where('status', 'open')->first();
 
-            'session_status' => 'closed'
+        if (!$session) {
 
+            return response()->json([
+                'success' => false,
+                'message' => 'Session tidak ditemukan.'
+            ], 404);
+
+        }
+
+        if ($session->status === 'closed') {
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Session sudah ditutup.'
+            ], 400);
+
+        }
+
+        $session->update([
+            'status' => 'closed',
+            'closed_at' => now()
         ]);
 
         return response()->json([
-
             'success' => true,
-            'message' => 'Session closed'
-
+            'message' => 'Session berhasil ditutup.'
         ]);
     }
+
 
 }
 

@@ -406,7 +406,7 @@ function closeSession(){
     btn.innerText = 'Saving...';
 
     fetch(
-        '/stock-opname/close',
+        '/api/warehouse/stock-opname/close',
         {
 
             method:'POST',

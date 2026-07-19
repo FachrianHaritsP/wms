@@ -21,4 +21,9 @@ class Product extends Model
         return $this->belongsTo(RackSlot::class);
     }
 
+    public function stockOpnameDetails()
+    {
+        return $this->hasMany(StockOpnameDetail::class);
+    }
+
 }
