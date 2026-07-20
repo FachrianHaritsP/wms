@@ -29,63 +29,65 @@ if(opnameSession){
 }
 
 function checkActiveSession(){
- 
+
+
     fetch(
-        '/api/warehouse/stock-opname/active-session'
+        '/api/warehouse/stock-opname/active'
     )
 
     .then(res => res.json())
 
     .then(data => {
 
-        if(data.session){
-          
-            opnameSession =
-                data.session.session_code;
+        if (data.success) {
 
-            document.getElementById(
-                'opnameForm'
-            ).style.display = 'block';
+        opnameSession = data.data.session_code;
 
-
-            updateSessionLabel('OPEN');
-
-            //btn 
-            document.getElementById(
-                'startBtn'
-            ).disabled = true;
-
-            document.getElementById(
-                'closeBtn'
-            ).disabled = false;
-
-            refreshOpnameHistory();
-
-        }else{
-            //btn
-            opnameSession = null;
-
-            document.getElementById(
-                'startBtn'
-            ).disabled = false;
-
-            document.getElementById(
-                'closeBtn'
-            ).disabled = true;
-            
-            document.getElementById(
-                'session_code'
-            ).innerText = '-';
-
-            let totalProducts =
         document.getElementById(
-            'total_products'
-        ).value;
+            'opnameForm'
+        ).style.display = 'block';
+
+        updateSessionLabel('OPEN');
+
+        document.getElementById(
+            'startBtn'
+        ).disabled = true;
+
+        document.getElementById(
+            'closeBtn'
+        ).disabled = false;
+
+        refreshOpnameHistory();
+
+    } else {
+
+        opnameSession = null;
+
+        document.getElementById(
+            'opnameForm'
+        ).style.display = 'none';
+
+        document.getElementById(
+            'startBtn'
+        ).disabled = false;
+
+        document.getElementById(
+            'closeBtn'
+        ).disabled = true;
+
+        document.getElementById(
+            'session_code'
+        ).innerText = '-';
+
+        let totalProducts =
+            document.getElementById(
+                'total_products'
+            ).value;
 
         document.getElementById(
             'counter'
         ).innerText =
-        'Items Checked : 0/' + totalProducts;
+            'Items Checked : 0/' + totalProducts;
 
         document.getElementById(
             'history_table'
@@ -96,10 +98,9 @@ function checkActiveSession(){
                 </td>
             </tr>
         `;
-
-        }
-
+    }
     });
+
 
 }
 
@@ -114,19 +115,43 @@ function refreshFill(){
 
 function startOpname(){
 
-    document.getElementById('opnameForm').style.display = 'block';
-    if(!opnameSession){
+    fetch('/api/warehouse/stock-opname/start', {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': document
+                .querySelector('meta[name="csrf-token"]')
+                .content
+        }
 
-    opnameSession =
-        'OPN-' + Date.now();
+    })
 
-    updateSessionLabel('OPEN');
-    
+    .then(res => res.json())
 
-    }
+    .then(data => {
 
-    console.log(opnameSession);
-    alert('Session Opname Started');
+        if(data.success){
+
+            opnameSession = data.data.session_code;
+
+            document.getElementById('opnameForm').style.display = 'block';
+
+            updateSessionLabel('OPEN');
+
+            document.getElementById('startBtn').disabled = true;
+            document.getElementById('closeBtn').disabled = false;
+
+            refreshOpnameHistory();
+
+            alert(data.message);
+
+        }else{
+
+            alert(data.message);
+
+        }
+
+    });
 
 }
 
@@ -166,46 +191,6 @@ function scanProduct(sku){
     });
 
 }
-
-
-// function scanProduct(){
-
-    
-//     //let scanner = document.getElementById('scanner').value;
-//     let product_id = document.getElementById('product_id').value;
-
-//     fetch('warehouse/scan/' + product_id) //scanner
-
-//     .then(res => res.json())
-
-//     .then(data => {
-
-//         console.log(data);
-
-//         // ambil product
-//         let product = data.data;
-
-//         // set hidden id
-//         document.getElementById('product_id').value = product.id;
-
-//         // tampil info
-//         document.getElementById('product_sku').innerText = product.sku;
-//         document.getElementById('product_name').innerText = product.name;
-//         document.getElementById('product_stock').innerText = product.stock;
-//         document.getElementById('product_location').innerText =  document.getElementById('product_location').innerText = product.rack_slot.rack.rack_code + ' - ' + product.rack_slot.slot_code;//product.rack + ' - ' + product.slot; 
-
-//     })
-
-//     .catch(err => {
-
-//         console.log(err);
-
-//         alert('Product tidak ditemukan');
-
-//     });
-
-// }
-
 
 function saveOpname(){
 
@@ -271,7 +256,12 @@ function saveOpname(){
 
 }
 
+   // 
+   //${item.user.name} 
+   //${item.match_status}
 function refreshOpnameHistory(){
+
+    console.log('Session ' + opnameSession);
 
     fetch(
     '/api/warehouse/stock-opname/history?session_code='
@@ -280,6 +270,8 @@ function refreshOpnameHistory(){
     .then(res => res.json())
 
     .then(result => {
+
+        console.log(result);
 
         let table =
             document.getElementById(
@@ -305,7 +297,7 @@ function refreshOpnameHistory(){
 
              let statusBadge = '';
 
-            if(item.status === 'match'){
+            if( item.match_status  === 'match'){ //item.match_status | item.status
 
                 statusBadge = `
                     <span class="bg-green-200 px-2 py-1 rounded">
@@ -327,8 +319,8 @@ function refreshOpnameHistory(){
 
             <tr>
 
-                <td class="border px-2 py-2">
-                    ${item.product.name}
+                <td class="border px-2 py-2"> 
+                    ${item.product.name} 
                 </td>
 
                 <td class="border px-2 py-2">
@@ -344,11 +336,12 @@ function refreshOpnameHistory(){
                 </td>
 
                 <td class="border px-2 py-2">
-                    ${statusBadge}   
+                    ${statusBadge}
                 </td>
 
                 <td class="border px-2 py-2 d-none d-md-table-cell">
-                    ${item.user.name}
+                    
+                    ${item.session.user.name} 
                 </td>
 
             </tr>
@@ -526,5 +519,4 @@ function selectProduct(){
 }
 
 loadProducts();
-refreshOpnameHistory();
 checkActiveSession();

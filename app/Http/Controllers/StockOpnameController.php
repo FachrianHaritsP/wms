@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\StockOpname;
 use Illuminate\Http\Request;
 use App\Models\ReturnItem;
 use App\Models\Product;
@@ -58,10 +57,15 @@ class StockOpnameController extends Controller
         ->first();
 
           if (!$session) {
+            // return response()->json([
+            //     'success' => false,
+            //     'message' => 'Tidak ada session aktif.'
+            // ], 404);
+
             return response()->json([
                 'success' => false,
                 'message' => 'Tidak ada session aktif.'
-            ], 404);
+            ]);
         }
 
 
@@ -72,35 +76,15 @@ class StockOpnameController extends Controller
 
     }
 
+
     public function index()
     {
+        $returns = ReturnItem::with('product')
+                    ->whereIn('status', ['pending', 'rejected'])
+                    ->latest()
+                    ->get();
 
-    $opnames = StockOpname::with('product','user')
-                ->latest()
-                ->paginate(10);
-
-    $returns = ReturnItem::with('product')
-                ->whereIn('status',['pending','rejected'])
-                ->latest()
-                ->get();
-    return view('stock-opname', compact('opnames','returns')); 
-
-    }
-
-    public function data()
-    {
-
-    $opnames = StockOpname::with('product','user')
-                ->latest()
-                ->paginate(10);
-
-    return response()->json([
-
-        'success' => true,
-        'data' => $opnames
-
-    ]);
-
+        return view('stock-opname', compact('returns'));
     }
 
     public function store(Request $request)
@@ -173,29 +157,35 @@ class StockOpnameController extends Controller
         ]);
     }
 
+
     public function history(Request $request)
     {
-        $query = StockOpnameSession::with([
-            'user',
-            'details.product'
+        $query = StockOpnameDetail::with([
+            'product',
+            'session.user'
         ]);
 
         if ($request->session_code) {
 
-            $query->where(
-                'session_code',
-                $request->session_code
-            );
+            $query->whereHas('session', function ($q) use ($request) {
+
+                $q->where(
+                    'session_code',
+                    $request->session_code
+                );
+
+            });
 
         }
 
-        $sessions = $query
+        $details = $query
             ->latest()
             ->get();
 
         return response()->json([
+            'session_code' => $request->session_code, //buat sementar
             'success' => true,
-            'data' => $sessions
+            'data' => $details
         ]);
     }
 

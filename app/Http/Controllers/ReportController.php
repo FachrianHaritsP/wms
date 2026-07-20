@@ -7,7 +7,8 @@ use App\Models\StockTransaction;
 use Illuminate\Support\Facades\DB;
 use App\Models\Product;
 use App\Models\ReturnItem;
-use App\Models\StockOpname;
+use App\Models\StockOpnameSession;
+use App\Models\StockOpnameDetail;
 
 class ReportController extends Controller
 {
@@ -48,13 +49,6 @@ class ReportController extends Controller
             return $query;
         };
 
-        // $transactions = StockTransaction::with(
-        //     'product',
-        //     'user'
-        // )
-        // ->latest()
-        // ->paginate(10);
-
         $transactions = $filterDate(
 
             StockTransaction::with(
@@ -65,17 +59,6 @@ class ReportController extends Controller
         )
         ->latest()
         ->paginate(10);
-
-        //kpi    
-        // $totalStockIn = StockTransaction::where(
-        //     'type',
-        //     'in'
-        // )->sum('qty');
-
-        // $totalStockOut = StockTransaction::where(
-        //     'type',
-        //     'out'
-        // )->sum('qty');
 
         //kpi
         $totalStockIn = $filterDate(
@@ -179,43 +162,31 @@ class ReportController extends Controller
             'rejected'
         ))->count();
 
-        //stockopname-report
-        $opnameSummary =  $filterDate(       
-        StockOpname::select(
-                'session_code',
 
-                DB::raw("
-                    SUM(
-                        CASE
-                            WHEN status = 'match'
-                            THEN 1
-                            ELSE 0
-                        END
-                    ) as total_match
-                "),
+        // Stock Opname Report
+        $opnameSummary = $filterDate(
 
-                DB::raw("
-                    SUM(
-                        CASE
-                            WHEN status = 'discrepancy'
-                            THEN 1
-                            ELSE 0
-                        END
-                    ) as total_discrepancy
-                "),
+            StockOpnameSession::withCount([
 
-                DB::raw("
-                    COUNT(*) as checked_products
-                ")
+                'details as total_match' => function ($query) {
+                    $query->where('match_status', 'match');
+                },
 
-        ))
+                'details as total_discrepancy' => function ($query) {
+                    $query->where('match_status', 'discrepancy');
+                },
 
-        ->whereNotNull('session_code')
-        ->groupBy('session_code')
+                'details as checked_products'
+
+            ])
+
+        )
+
         ->latest()
         ->take(5)
         ->get();
-  
+
+
 
         $totalProducts = Product::count();
 

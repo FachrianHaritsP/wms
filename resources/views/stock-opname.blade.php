@@ -150,12 +150,6 @@
                         </tbody>
 
                     </table>
-
-                    <div class="mt-4">
-
-                        {{ $opnames->links() }}
-
-                    </div>
                 </div>
             </div>
 
