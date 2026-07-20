@@ -26,79 +26,119 @@ function loadDashboard(){
 
         // Low stock table
         let table = document.getElementById('low_stock_table')
+        const tbody = document.getElementById('low_stock_table');
+
+        if (data.low_stock.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="3" class="text-center text-muted py-3">
+                        Belum ada data stok rendah.
+                    </td>
+                </tr>
+            `;
+        } else {
+            tbody.innerHTML = data.low_stock.map(item => `
+                <tr>
+                    <td>${item.sku}</td>
+                    <td>${item.name}</td>
+                    <td>${item.stock}</td>
+                </tr>
+            `).join('');
+        }
         // biar ga double
-        table.innerHTML = '';
-        data.low_stock.forEach(item => {
+        // table.innerHTML = '';
+        // data.low_stock.forEach(item => {
 
-            table.innerHTML += `
-            <tr>
-                <td>${item.sku}</td>
-                <td>${item.name}</td>
-                <td>${item.stock}</td>
-            </tr>
-            `
-        })
+        //     table.innerHTML += `
+        //     <tr>
+        //         <td>${item.sku}</td>
+        //         <td>${item.name}</td>
+        //         <td>${item.stock}</td>
+        //     </tr>
+        //     `
+        // })
 
-        //product movement
-        let productLabels = []
-        let productData = []
 
-        data.product_movement.forEach(item => {
-            productLabels.push(item.name)
-        productData.push(item.total_out)
-        })
+        if(data.product_movement.length === 0){
+            document.getElementById('productMovementEmpty').style.display='block';
+            document.getElementById('productChart').style.display='none';
+        }else{
+            document.getElementById('productMovementEmpty').style.display='none';
+            document.getElementById('productChart').style.display='block';
 
-        if(productChart){
+            // render chart
+            //product movement
+            let productLabels = []
+            let productData = []
 
-            productChart.destroy();
+            data.product_movement.forEach(item => {
+                productLabels.push(item.name)
+            productData.push(item.total_out)
+            })
 
-        }
+            if(productChart){
 
-        productChart = new Chart(document.getElementById('productChart'), {
-            type: 'bar',
-                data: {
-                labels: productLabels,
-                    datasets: [{
-                    label: 'Product Movement',
-                    data: productData
-                    }]
-                }
-        })
-        
-        //stock movement
-        let dates = []
-        let stockIn = []
-        let stockOut = []
+                productChart.destroy();
 
-        data.stock_movement.forEach(item =>{
-            dates.push(item.date)
-            stockIn.push(item.total_in)
-            stockOut.push(item.total_out)
-        })
-
-        if(stockChart){
-
-            stockChart.destroy();
-
-        }
-        stockChart = new Chart(document.getElementById('stockChart'),{
-            type: 'line',
-            
-            data :{
-                labels : dates,
-                datasets:[
-                    {
-                        label: 'Stock In',
-                        data: stockIn
-                    },
-                    {
-                        label:'Stock Out',
-                        data: stockOut
-                    }
-                ]
             }
-        })
 
+            productChart = new Chart(document.getElementById('productChart'), {
+                type: 'bar',
+                    data: {
+                    labels: productLabels,
+                        datasets: [{
+                        label: 'Product Movement',
+                        data: productData
+                        }]
+                    }
+            })
+
+        }//end else
+
+        if(data.stock_movement.length === 0){
+            document.getElementById('stockMovementEmpty').style.display='block';
+            document.getElementById('stockChart').style.display='none';
+        }else{
+            document.getElementById('stockMovementEmpty').style.display='none';
+            document.getElementById('stockChart').style.display='block';
+
+            //stock movement
+            let dates = []
+            let stockIn = []
+            let stockOut = []
+
+            data.stock_movement.forEach(item =>{
+                dates.push(item.date)
+                stockIn.push(item.total_in)
+                stockOut.push(item.total_out)
+            })
+
+            if(stockChart){
+
+                stockChart.destroy();
+
+            }
+            stockChart = new Chart(document.getElementById('stockChart'),{
+                type: 'line',
+                
+                data :{
+                    labels : dates,
+                    datasets:[
+                        {
+                            label: 'Stock In',
+                            data: stockIn
+                        },
+                        {
+                            label:'Stock Out',
+                            data: stockOut
+                        }
+                    ]
+                }
+            })
+
+        }//end else
+
+   
     });
 
 }

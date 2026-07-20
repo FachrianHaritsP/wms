@@ -87,19 +87,40 @@
 
             <div class="row">
 
+                <!-- Product -->
                 <div class="col-md-6">
-                <h5>Pergerakan Produk</h5>
-                <canvas id="productChart"></canvas>
+
+                    <h5>Pergerakan Produk</h5>
+
+                    <div id="productMovementEmpty"
+                        class="text-center text-muted py-5"
+                        style="display:none;">
+                        Belum ada data pergerakan produk.
+                    </div>
+
+                    <canvas id="productChart"></canvas>
+
                 </div>
 
+                <!-- Stock -->
                 <div class="col-md-6">
-                <h5>Pergerakan Stok</h5>
-                <canvas id="stockChart"></canvas>
+
+                    <h5>Pergerakan Stok</h5>
+
+                    <div id="stockMovementEmpty"
+                        class="text-center text-muted py-5"
+                        style="display:none;">
+                        Belum ada data pergerakan stok.
+                    </div>
+
+                    <canvas id="stockChart"></canvas>
+
                 </div>
 
             </div>
 
         </div>
+         <!-- endCharts -->
 
     </div>
     <!-- end bungkus --->

@@ -12,7 +12,7 @@
             <div class="mb-3">
                 <label>Product ID</label>
 
-                <select id="product_id">
+                {{-- <select id="product_id">
                     <option value="">
                         Pilih Produk
                     </option>
@@ -25,7 +25,32 @@
                         </option>
 
                     @endforeach
+                </select> --}}
+
+                <select id="product_id" {{ $products->isEmpty() ? 'disabled' : '' }}>
+
+                    @if($products->isEmpty())
+
+                        <option value="">
+                            Belum ada produk
+                        </option>
+
+                    @else
+
+                        <option value="">
+                            Pilih Produk
+                        </option>
+
+                        @foreach($products as $product)
+                            <option value="{{ $product->id }}">
+                                {{ $product->name }}
+                            </option>
+                        @endforeach
+
+                    @endif
+
                 </select>
+
             </div>
 
             <div class="mb-3">
@@ -43,7 +68,14 @@
                 <textarea id="notes" class="form-control"></textarea>
             </div>
 
-            <button id="submitBtn" onclick="submitReturn()" class="btn btn-primary w-100">
+            {{-- <button id="submitBtn" onclick="submitReturn()" class="btn btn-primary w-100">
+                Submit Return
+            </button> --}}
+            <button
+                id="submitBtn"
+                onclick="submitReturn()"
+                class="btn btn-primary w-100"
+                {{ $products->isEmpty() ? 'disabled' : '' }}>
                 Submit Return
             </button>
 
@@ -74,7 +106,7 @@
 
                     <tbody>
 
-                        @foreach($returns as $return)
+                        @forelse($returns as $return)
 
                         <tr>
 
@@ -152,7 +184,15 @@
 
                         </tr>
 
-                        @endforeach
+                        @empty
+
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-3">
+                                Belum ada data return.
+                            </td>
+                        </tr>
+
+                        @endforelse
 
                     </tbody>
                 </table>

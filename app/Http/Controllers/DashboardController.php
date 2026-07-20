@@ -100,25 +100,9 @@ class DashboardController extends Controller
 
     private function getLowStock()
     {
-    return Product::where('stock','<=',5)->get();
+        return Product::where('stock','<=',5)->get();
     }
 
-    // private function getProductMovement($period )
-    // {
-    //     return StockTransaction::select(
-    //         //'product_id',
-    //         'products.name',
-    //         'products.sku',
-    //         //DB::raw('SUM(qty) as total_out')
-    //         DB::raw('SUM(stock_transactions.qty) as total_out')
-    //     )
-    //     ->join('products','products.id','=','stock_transactions.product_id')
-    //     ->where('stock_transactions.type','out')
-    //     ->groupBy('products.name','products.sku')
-    //     ->orderByDesc('total_out')
-    //     ->take(5)
-    //     ->get();
-    // }
 
     private function getProductMovement($period)
     {
@@ -181,18 +165,6 @@ class DashboardController extends Controller
             ->get();
     }
 
-    // private function getStockMovement()
-    // {
-    //     return StockTransaction::select(
-    //         DB::raw('DATE(created_at) as date'),
-    //         DB::raw('SUM(CASE WHEN type="in" THEN qty ELSE 0 END) as total_in'),
-    //         DB::raw('SUM(CASE WHEN type="out" THEN qty ELSE 0 END) as total_out')
-    //     )
-    //     ->groupBy('date')
-    //     ->orderBy('date','desc')
-    //     ->take(7)
-    //     ->get();
-    // }
 
     private function getStockMovement($period)
     {
