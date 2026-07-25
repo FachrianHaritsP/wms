@@ -14,12 +14,16 @@ use App\Http\Controllers\ProductController;
 
 /*
 |--------------------------------------------------------------------------
-| Landing Page
+| Landing Page -->> login Page
 |--------------------------------------------------------------------------
 */
 
+// Route::get('/', function () {
+//     return view('welcome');
+// });
+
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('login');
 });
 
 /*
