@@ -9,8 +9,7 @@ function loadDashboard(){
         ).value;
 
     fetch(
-        '/api/warehouse/dashboard?period='
-        + period
+        '/dashboard/data?period=' + period //'/api/warehouse/dashboard?period='
     )
 
     .then(res => res.json())
@@ -45,18 +44,6 @@ function loadDashboard(){
                 </tr>
             `).join('');
         }
-        // biar ga double
-        // table.innerHTML = '';
-        // data.low_stock.forEach(item => {
-
-        //     table.innerHTML += `
-        //     <tr>
-        //         <td>${item.sku}</td>
-        //         <td>${item.name}</td>
-        //         <td>${item.stock}</td>
-        //     </tr>
-        //     `
-        // })
 
 
         if(data.product_movement.length === 0){

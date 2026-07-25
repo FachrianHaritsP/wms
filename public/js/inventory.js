@@ -4,8 +4,10 @@ function loadProducts(page = 1, search = ''){
 
     table.innerHTML ='<tr><td colspan="8" class="text-center">Loading...</td></tr>';
 
-  
-    fetch('/api/warehouse/products?page='+ page +'&search=' + search)
+    //api
+    //fetch('/api/warehouse/products?page='+ page +'&search=' + search)
+    //web
+    fetch('/inventory/products?page=' + page + '&search=' + search)
 
     .then(res => res.json())
     .then(response => {
@@ -180,7 +182,10 @@ function saveProduct(){
         rack_slot_id: rack_slot_id,
     };
 
-    let url = '/api/warehouse/products';
+    //api
+    //let url = '/api/warehouse/products';
+    //web
+    let url = '/inventory/products';
     let method = 'POST';
 
     if(id){
@@ -245,7 +250,10 @@ function saveProduct(){
 
 function openEditModal(id){
 
-    fetch('/api/warehouse/products/' + id)
+    //api
+    //fetch('/api/warehouse/products/' + id)
+    //web
+    fetch('/inventory/products/' + id)
     .then(res => res.json())
     .then(response => {
         let data = response.data
@@ -269,7 +277,10 @@ function openEditModal(id){
 
 function openInfoModal(id){
 
-    fetch('/api/warehouse/products/' + id)
+    //api
+    //fetch('/api/warehouse/products/' + id)
+    //web
+    fetch('/inventory/products/' + id)
 
     .then(res => res.json())
 
@@ -330,7 +341,8 @@ function confirmDelete(){
     btn.disabled = true;
     btn.innerText = 'Deleting...';
 
-    fetch('/api/warehouse/products/' + id,{
+    //'/inventory/products/' + id, | api '/api/warehouse/products/' + id,
+    fetch('/inventory/products/' + id,{
 
         method:'DELETE',
 

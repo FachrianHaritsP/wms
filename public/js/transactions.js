@@ -47,7 +47,8 @@ function handleScan(sku){
     clearForm();
     resetCard();
 
-    fetch('/api/warehouse/scan/' + sku)
+    //fetch('/api/warehouse/scan/' + sku)
+    fetch('/warehouse/scan/' + sku)
 
     .then(res => res.json())
 
@@ -309,13 +310,21 @@ function loadHistory(){
     }
 
     fetch(
-    '/api/warehouse/transactions?type='
+    '/warehouse/transactions/history?type='
     + transactionType
     + '&start_date='
     + startDate
     + '&end_date='
     + endDate
     )
+    // fetch(
+    // '/api/warehouse/transactions?type='
+    // + transactionType
+    // + '&start_date='
+    // + startDate
+    // + '&end_date='
+    // + endDate
+    // )
     .then(res => res.json())
     .then(response => {
 
@@ -496,7 +505,7 @@ function updateTransaction(){
     }
 
     fetch(
-        '/transactions/' + transaction_id,
+        '/warehouse/transactions/' + transaction_id,
         {
 
             method: 'PUT',

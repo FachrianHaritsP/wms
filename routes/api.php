@@ -35,12 +35,10 @@ Route::middleware('auth:sanctum')
 
 });
 
-//web + flutter
-Route::prefix('warehouse')
-    ->middleware('auth:sanctum')
-    ->group(function(){
 
-    //dashboard
+Route::prefix('warehouse')
+    ->group(function () {
+
     Route::get('/dashboard', [DashboardController::class, 'index']);
     //product
     Route::get('/products',[ProductController::class, 'index']);
@@ -67,5 +65,39 @@ Route::prefix('warehouse')
     Route::post('/stock-opname/start', [StockOpnameController::class, 'startSession']);
     Route::post('/stock-opname/close', [StockOpnameController::class, 'closeSession']);
     Route::get('/stock-opname/active', [ StockOpnameController::class, 'activeSession']);
+    });
 
-});
+    //web + flutter
+// Route::prefix('warehouse')
+//     ->middleware('auth:sanctum')
+//     ->group(function(){
+
+//     //dashboard
+//     Route::get('/dashboard', [DashboardController::class, 'index']);
+//     //product
+//     Route::get('/products',[ProductController::class, 'index']);
+//     Route::post('/products',[ProductController::class, 'store']);
+//     Route::get('/products/{id}', [ProductController::class, 'show']);
+//     Route::put('/products/{id}', [ProductController::class, 'update']);
+//     Route::delete('/products/{id}', [ProductController::class, 'destroy']);
+//     //scan    
+//     Route::get('scan/{sku}', [ScanController::class, 'scan']);
+//     //stock    
+//     Route::post('/stock-in', [StockController::class, 'stockIn']);
+//     Route::post('/stock-out', [StockController::class, 'stockOut']);
+//     Route::get('/transactions', [StockController::class, 'history']);
+//     //return
+//     Route::get('/returns', [ReturnController::class, 'apiIndex']);
+//     Route::post('/returns', [ReturnController::class, 'store']);
+//     Route::put('/returns/{id}', [ReturnController::class, 'update']);
+//     Route::post('/returns/{id}/cancel', [ReturnController::class, 'cancel']);
+//     //stock opname
+//     Route::get('/stock-opname/history',[StockOpnameController::class,'history']); //belum pakai
+//     //Route::get('/stock-opname/active-session',[StockOpnameController::class, 'activeSession']); mau dibuang
+//     Route::post('/stock-opname',[StockOpnameController::class, 'store']);
+//     //stock opnmae logic baru
+//     Route::post('/stock-opname/start', [StockOpnameController::class, 'startSession']);
+//     Route::post('/stock-opname/close', [StockOpnameController::class, 'closeSession']);
+//     Route::get('/stock-opname/active', [ StockOpnameController::class, 'activeSession']);
+
+// });

@@ -32,7 +32,7 @@ function checkActiveSession(){
 
 
     fetch(
-        '/api/warehouse/stock-opname/active'
+        '/warehouse/stock-opname/active'
     )
 
     .then(res => res.json())
@@ -115,7 +115,7 @@ function refreshFill(){
 
 function startOpname(){
 
-    fetch('/api/warehouse/stock-opname/start', {
+    fetch('/warehouse/stock-opname/start', {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -206,7 +206,7 @@ function saveOpname(){
     btn.disabled = true;
     btn.innerText = 'Saving...';
 
-    fetch('/stock-opname', {
+    fetch('/warehouse/stock-opname', {
 
         method:'POST',
 
@@ -264,7 +264,7 @@ function refreshOpnameHistory(){
     console.log('Session ' + opnameSession);
 
     fetch(
-    '/api/warehouse/stock-opname/history?session_code='
+    '/warehouse/stock-opname/history?session_code='
     + opnameSession)
 
     .then(res => res.json())
@@ -399,7 +399,7 @@ function closeSession(){
     btn.innerText = 'Saving...';
 
     fetch(
-        '/api/warehouse/stock-opname/close',
+        '/warehouse/stock-opname/close',
         {
 
             method:'POST',
@@ -456,7 +456,7 @@ function updateSessionLabel(status){
 //dropbox load
 function loadProducts(){
 
-    fetch('/api/warehouse/products')
+    fetch('/warehouse/products')
 
     .then(res => res.json())
 
@@ -485,7 +485,7 @@ function loadProducts(){
 }
 
 function loadProductDetail(id){
-    fetch('/api/warehouse/products/' + id)
+    fetch('/warehouse/products/' + id)
 
     .then(res => res.json())
 
