@@ -1,208 +1,224 @@
+
 @extends('layouts.main')
 
 @section('content')
 
-<h3 id="returnsTitle">Create Return</h3>
+<div class="container-fluid">
 
-<div class="row mt-3">
-    <!-- Card create return -->
-    <div class="col-12 col-lg-4 mb-3">
-        <div class="card p-3" >
+    <h2 class="mt-2">Create Return</h2>
 
-            <div class="mb-3">
-                <label>Product ID</label>
+    <div class="row mt-3">
 
-                {{-- <select id="product_id">
-                    <option value="">
-                        Pilih Produk
-                    </option>
-                     @foreach($products as $product)
+        <!-- Create Return -->
+        <div class="col-12 col-lg-4 mb-3">
 
-                        <option value="{{ $product->id }}">
+            <div class="card p-3">
 
-                            {{ $product->name }}
+                <div class="mb-3">
+                    <label>Product</label>
 
-                        </option>
+                    <select
+                        id="product_id"
+                        class="form-select"
+                        {{ $products->isEmpty() ? 'disabled' : '' }}>
 
-                    @endforeach
-                </select> --}}
+                        @if($products->isEmpty())
 
-                <select id="product_id" {{ $products->isEmpty() ? 'disabled' : '' }}>
-
-                    @if($products->isEmpty())
-
-                        <option value="">
-                            Belum ada produk
-                        </option>
-
-                    @else
-
-                        <option value="">
-                            Pilih Produk
-                        </option>
-
-                        @foreach($products as $product)
-                            <option value="{{ $product->id }}">
-                                {{ $product->name }}
+                            <option value="">
+                                Belum ada produk
                             </option>
-                        @endforeach
 
-                    @endif
+                        @else
 
-                </select>
+                            <option value="">
+                                Pilih Produk
+                            </option>
+
+                            @foreach($products as $product)
+
+                                <option value="{{ $product->id }}">
+                                    {{ $product->name }}
+                                </option>
+
+                            @endforeach
+
+                        @endif
+
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label>Qty</label>
+                    <input
+                        type="number"
+                        id="qty"
+                        class="form-control"
+                        value="1">
+                </div>
+
+                <div class="mb-3">
+                    <label>Reason</label>
+                    <textarea
+                        id="reason"
+                        class="form-control">Barang cacat</textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label>Notes</label>
+                    <textarea
+                        id="notes"
+                        class="form-control"></textarea>
+                </div>
+
+                <button
+                    id="submitBtn"
+                    onclick="submitReturn()"
+                    class="btn btn-primary w-100"
+                    {{ $products->isEmpty() ? 'disabled' : '' }}>
+                    Submit Return
+                </button>
 
             </div>
-
-            <div class="mb-3">
-                <label>Qty</label>
-                <input type="number" id="qty" class="form-control" value="1">
-            </div>
-
-            <div class="mb-3">
-                <label>Reason</label>
-                <textarea id="reason" class="form-control">Barang cacat</textarea>
-            </div>
-
-            <div class="mb-3">
-                <label>Notes</label>
-                <textarea id="notes" class="form-control"></textarea>
-            </div>
-
-            {{-- <button id="submitBtn" onclick="submitReturn()" class="btn btn-primary w-100">
-                Submit Return
-            </button> --}}
-            <button
-                id="submitBtn"
-                onclick="submitReturn()"
-                class="btn btn-primary w-100"
-                {{ $products->isEmpty() ? 'disabled' : '' }}>
-                Submit Return
-            </button>
 
         </div>
-    </div>
 
-    <!-- History -->
-    <div class="col-12 col-lg-8">
-        <div class="card p-3">
-            <h5>Return History</h5>
-            <div class="table-responsive">
-                <table class="table table-sm">
 
-                    <thead>
+        <!-- Return History -->
+        <div class="col-12 col-lg-8">
 
-                        <tr class="bg-gray-200">
+            <div class="card p-3">
 
-                            <th class="border px-2 py-2">Product</th>
-                            <th class="border px-2 py-2 d-none d-md-table-cell">Qty</th>
-                            <th class="border px-2 py-2">Reason</th>
-                            <th class="border px-2 py-2">Status</th>
-                            <th class="border px-2 py-2 d-none d-md-table-cell">User</th>
-                            <th class="border px-2 py-2">Action</th>
-                
-                        </tr>
+                <h5>Return History</h5>
 
-                    </thead>
+                <div class="table-responsive">
 
-                    <tbody id="returnTable">
+                    <table class="table table-bordered table-striped table-sm small">
 
-                        @forelse($returns as $return)
+                        <thead class="table-dark">
 
-                        <tr>
+                            <tr>
 
-                            <td class="border px-2 py-2">
-                                {{ $return->product->name }}
-                            </td>
+                                <th>Product</th>
 
-                            <td class="border px-1 py-1">
-                                {{ $return->qty }}
-                            </td>
+                                <th class="d-none d-md-table-cell">
+                                    Qty
+                                </th>
 
-                            <td class="border px-2 py-2">
-                                {{ $return->reason }}
-                            </td>
+                                <th>Reason</th>
 
-                            <td class="border px-1 py-1">
+                                <th>Status</th>
 
-                                @if($return->status == 'pending')
+                                <th class="d-none d-md-table-cell">
+                                    User
+                                </th>
 
-                                    <span class="bg-yellow-200 px-1 py-1 rounded">
-                                        Pending
-                                    </span>
+                                <th>
+                                    Action
+                                </th>
 
-                                @endif
-                                @if($return->status == 'rejected')
+                            </tr>
 
-                                    <span class="bg-red-200 px-1 py-1 rounded">
-                                        Rejected
-                                    </span>
+                        </thead>
 
-                                @endif
-                                @if($return->status == 'approved')
+                        <tbody id="returnTable">
 
-                                    <span class="bg-green-200 px-1 py-1 rounded">
-                                        Approved
-                                    </span>
+                            @forelse($returns as $return)
 
-                                @endif
+                                <tr>
 
-                            </td>
+                                    <td>
+                                        {{ $return->product->name }}
+                                    </td>
 
-                            <td class="border px-2 py-2 d-none d-md-table-cell">
-                                {{ $return->user->name }}
-                            </td>
+                                    <td class="d-none d-md-table-cell">
+                                        {{ $return->qty }}
+                                    </td>
 
-                            <td>
+                                    <td>
+                                        {{ $return->reason }}
+                                    </td>
 
-                                <button
-                                    class="btn btn-warning btn-sm"
+                                    <td>
 
-                                    onclick="editReturn(
+                                        @if($return->status == 'pending')
 
-                                        {{ $return->id }},
+                                            <span class="badge bg-warning text-dark">
+                                                Pending
+                                            </span>
 
-                                        {{ $return->product_id }},
+                                        @elseif($return->status == 'rejected')
 
-                                        {{ $return->qty }},
+                                            <span class="badge bg-danger">
+                                                Rejected
+                                            </span>
 
-                                        '{{ $return->reason }}',
+                                        @elseif($return->status == 'approved')
 
-                                        '{{ $return->notes }}'
+                                            <span class="badge bg-success">
+                                                Approved
+                                            </span>
 
-                                    )">
+                                        @endif
 
-                                    Edit
+                                    </td>
 
-                                </button>
+                                    <td class="d-none d-md-table-cell">
+                                        {{ $return->user->name }}
+                                    </td>
 
-                                <button
-                                    class="btn btn-danger btn-sm" onclick="cancelReturn({{ $return->id }})">
-                                    Cancel
-                                </button>
+                                    <td class="text-nowrap">
 
-                            </td>
+                                        <button
+                                            class="btn btn-warning btn-sm me-1"
+                                            onclick="editReturn(
+                                                {{ $return->id }},
+                                                {{ $return->product_id }},
+                                                {{ $return->qty }},
+                                                '{{ $return->reason }}',
+                                                '{{ $return->notes }}'
+                                            )">
+                                            Edit
+                                        </button>
 
-                        </tr>
+                                        <button
+                                            class="btn btn-danger btn-sm"
+                                            onclick="cancelReturn({{ $return->id }})">
+                                            Cancel
+                                        </button>
 
-                        @empty
+                                    </td>
 
-                        <tr>
-                            <td colspan="6" class="text-center text-muted py-3">
-                                Belum ada data return.
-                            </td>
-                        </tr>
+                                </tr>
 
-                        @endforelse
+                            @empty
 
-                    </tbody>
-                </table>
+                                <tr>
+
+                                    <td
+                                        colspan="6"
+                                        class="text-center text-muted py-3">
+
+                                        Belum ada data return.
+
+                                    </td>
+
+                                </tr>
+
+                            @endforelse
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
             </div>
-        
+
         </div>
-    
+
     </div>
 
-</div><!-- end-div-row-->
+</div>
 
 <script src="/js/returns.js"></script>
 

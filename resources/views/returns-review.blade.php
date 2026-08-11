@@ -1,241 +1,300 @@
+
 @extends('layouts.main')
 
 @section('content')
 
-<div class="table-responsive">
+<div class="container-fluid">
 
-    <h3 class="mb-4 font-bold text-xl">
-        Return Review
-    </h3>
+    <h2 class="mt-2">Return Review</h2>
 
-    <div class="card mb-3">
+
+    {{-- ========================= --}}
+    {{-- PENDING APPROVAL --}}
+    {{-- ========================= --}}
+
+    <div class="card mb-4">
 
         <div class="card-header">
-
-            Pending Approval ({{ $pendingReturns->count() }})
-
+            <strong>
+                Pending Approval ({{ $pendingReturns->count() }})
+            </strong>
         </div>
 
         <div class="card-body">
 
-            {{-- Tabel Pending --}}
-            <h4 class="mb-3">Pending Approval</h4>
-            <table class="table table-bordered table-striped table-sm small">     
-                <thead>
+            <h5 class="mb-3">Pending Approval</h5>
 
-                    <tr class="bg-gray-200">
+            <div class="table-responsive">
 
-                        <th class="border px-2 py-2">Product</th>
+                <table class="table table-bordered table-striped table-sm small">
 
-                        <th class="border px-2 py-2 d-none d-md-table-cell">Qty</th>
-
-                        <th class="border px-2 py-2">Reason</th>
-
-                        <th class="border px-2 py-2">Status</th>
-
-                        <th class="border px-2 py-2 d-none d-md-table-cell">User</th>
-
-                        <th class="border px-2 py-2">Action</th>
-
-                    </tr>
-
-                </thead>
-                <tbody>
-
-                    @if($pendingReturns->isEmpty())
+                    <thead class="table-dark">
 
                         <tr>
 
-                            <td
-                            colspan="6"
-                            class="text-center">
+                            <th>Product</th>
 
-                            Tidak ada return yang menunggu approval.
+                            <th class="d-none d-md-table-cell">
+                                Qty
+                            </th>
 
-                            </td>
+                            <th>Reason</th>
 
-                        </tr>
+                            <th>Status</th>
 
-                    @else
+                            <th class="d-none d-md-table-cell">
+                                User
+                            </th>
 
-                    @foreach($pendingReturns as $return)
-
-                        <tr>
-
-                            <td>{{ $return->product->name }}</td>
-
-                            <td>{{ $return->qty }}</td>
-
-                            <td>{{ $return->reason }}</td>
-
-                            <td>
-                                <span class="badge bg-warning">
-                                    Pending
-                                </span>
-                            </td>
-
-                            <td>{{ $return->user->name }}</td>
-
-                            <td>
-
-                            <div class="d-flex gap-2">
-
-                            <form
-                                action="/returns/{{ $return->id }}/approve"
-                                method="POST"
-                                onsubmit="return disableSubmit(this, 'Processing...')">
-
-                                    @csrf
-                                    @method('PATCH')
-
-                                    <button
-                                        class="btn btn-success btn-sm">
-
-                                        Approve
-
-                                    </button>
-
-                                </form>
-                            <form
-                                action="/returns/{{ $return->id }}/reject"
-                                method="POST"
-                                onsubmit="return disableSubmit(this, 'Processing...')">
-                                @csrf
-                                    @method('PATCH')
-
-                                    <button
-                                        class="btn btn-danger btn-sm">
-
-                                        Reject
-
-                                    </button>
-                                </form>
-
-                                </div>
-                            </td>
+                            <th>
+                                Action
+                            </th>
 
                         </tr>
 
-                    @endforeach
+                    </thead>
 
-                    @endif
-                    
-                    
-                </tbody>
-            </table>
+                    <tbody>
+
+                        @if($pendingReturns->isEmpty())
+
+                            <tr>
+
+                                <td
+                                    colspan="6"
+                                    class="text-center text-muted py-3">
+
+                                    Tidak ada return yang menunggu approval.
+
+                                </td>
+
+                            </tr>
+
+                        @else
+
+                            @foreach($pendingReturns as $return)
+
+                                <tr>
+
+                                    <td>
+                                        {{ $return->product->name }}
+                                    </td>
+
+                                    <td class="d-none d-md-table-cell">
+                                        {{ $return->qty }}
+                                    </td>
+
+                                    <td>
+                                        {{ $return->reason }}
+                                    </td>
+
+                                    <td>
+                                        <span class="badge bg-warning text-dark">
+                                            Pending
+                                        </span>
+                                    </td>
+
+                                    <td class="d-none d-md-table-cell">
+                                        {{ $return->user->name }}
+                                    </td>
+
+                                    <td class="text-nowrap">
+
+                                        <div class="d-flex gap-1">
+
+                                            <form
+                                                action="/returns/{{ $return->id }}/approve"
+                                                method="POST"
+                                                onsubmit="return disableSubmit(this)">
+
+                                                @csrf
+                                                @method('PATCH')
+
+                                                <button
+                                                    type="submit"
+                                                    class="btn btn-success btn-sm">
+
+                                                    Approve
+
+                                                </button>
+
+                                            </form>
+
+
+                                            <form
+                                                action="/returns/{{ $return->id }}/reject"
+                                                method="POST"
+                                                onsubmit="return disableSubmit(this)">
+
+                                                @csrf
+                                                @method('PATCH')
+
+                                                <button
+                                                    type="submit"
+                                                    class="btn btn-danger btn-sm">
+
+                                                    Reject
+
+                                                </button>
+
+                                            </form>
+
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+
+                            @endforeach
+
+                        @endif
+
+                    </tbody>
+
+                </table>
+
+            </div>
 
         </div>
 
     </div>
 
-    {{-- Tabel history --}}
-    <h4 class="mb-3">Return History</h4>
-    <table class="table table-bordered table-striped table-sm small">
-        
-        <thead>
 
-            <tr class="bg-gray-200">
+    {{-- ========================= --}}
+    {{-- RETURN HISTORY --}}
+    {{-- ========================= --}}
 
-                <th class="border px-2 py-2">Product</th>
+    <div class="card">
 
-                <th class="border px-2 py-2 d-none d-md-table-cell">Qty</th>
+        <div class="card-body">
 
-                <th class="border px-2 py-2">Reason</th>
+            <h5 class="mb-3">Return History</h5>
 
-                <th class="border px-2 py-2">Status</th>
+            <div class="table-responsive">
 
-                <th class="border px-2 py-2 d-none d-md-table-cell">User</th>
+                <table class="table table-bordered table-striped table-sm small">
+
+                    <thead class="table-dark">
+
+                        <tr>
+
+                            <th>Product</th>
+
+                            <th class="d-none d-md-table-cell">
+                                Qty
+                            </th>
+
+                            <th>Reason</th>
+
+                            <th>Status</th>
+
+                            <th class="d-none d-md-table-cell">
+                                User
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        @if($historyReturns->isEmpty())
+
+                            <tr>
+
+                                <td
+                                    colspan="5"
+                                    class="text-center text-muted py-3">
+
+                                    Belum ada riwayat return.
+
+                                </td>
+
+                            </tr>
+
+                        @else
+
+                            @foreach($historyReturns as $return)
+
+                                <tr>
+
+                                    <td>
+                                        {{ $return->product->name }}
+                                    </td>
+
+                                    <td class="d-none d-md-table-cell">
+                                        {{ $return->qty }}
+                                    </td>
+
+                                    <td>
+                                        {{ $return->reason }}
+                                    </td>
+
+                                    <td>
+
+                                        @if($return->status == 'cancelled')
+
+                                            <span class="badge bg-secondary">
+                                                Cancelled
+                                            </span>
+
+                                        @elseif($return->status == 'rejected')
+
+                                            <span class="badge bg-danger">
+                                                Rejected
+                                            </span>
+
+                                        @elseif($return->status == 'approved')
+
+                                            <span class="badge bg-success">
+                                                Approved
+                                            </span>
+
+                                        @elseif($return->status == 'pending')
+
+                                            <span class="badge bg-warning text-dark">
+                                                Pending
+                                            </span>
+
+                                        @endif
+
+                                    </td>
+
+                                    <td class="d-none d-md-table-cell">
+                                        {{ $return->user->name }}
+                                    </td>
+
+                                </tr>
+
+                            @endforeach
+
+                        @endif
+
+                    </tbody>
+
+                </table>
+
+            </div>
 
 
-            </tr>
+            <div class="mt-3">
 
-        </thead>
+                {{ $historyReturns->links() }}
 
-         <tbody>
+            </div>
 
-            @if($historyReturns ->isEmpty())
-
-            <tr>
-
-                <td
-                colspan="6"
-                class="text-center">
-
-                Tidak ada return yang menunggu approval.
-
-                </td>
-
-            </tr>
-
-            @else
-
-            @foreach($historyReturns as $return)
-                <tr>
-
-                    <td>{{ $return->product->name }}</td>
-
-                    <td>{{ $return->qty }}</td>
-
-                    <td>{{ $return->reason }}</td>
-
-                    <td class="border px-1 py-1">
-
-                                @if($return->status == 'pending')
-
-                                    <span class="bg-yellow-200 px-1 py-1 rounded">
-                                        Pending
-                                    </span>
-
-                                @endif
-                                @if($return->status == 'cancelled')
-
-                                    <span class="bg-gray-200 px-1 py-1 rounded">
-                                        Cancelled
-                                    </span>
-
-                                @endif
-                                @if($return->status == 'rejected')
-
-                                    <span class="bg-red-200 px-1 py-1 rounded">
-                                        Rejected
-                                    </span>
-
-                                @endif
-                                @if($return->status == 'approved')
-
-                                    <span class="bg-green-200 px-1 py-1 rounded">
-                                        Approved
-                                    </span>
-
-                                @endif
-
-                    </td>
-
-                    <td>{{ $return->user->name }}</td>
-
-                </tr>
-            @endforeach
-
-            @endif
-            
-        </tbody>
-    </table>
-
-    <div class="mt-4">
-
-        {{-- dulu {{ $returns->links() }} --}}
-        {{ $historyReturns->links() }}
+        </div>
 
     </div>
 
 </div>
 
+
 <script>
 
 function disableSubmit(form){
 
-    let btn =
-        form.querySelector('button');
+    let btn = form.querySelector('button');
 
     btn.disabled = true;
 
@@ -246,6 +305,5 @@ function disableSubmit(form){
 }
 
 </script>
-
 
 @endsection

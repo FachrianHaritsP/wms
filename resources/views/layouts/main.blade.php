@@ -39,7 +39,9 @@
         }
     }
     </style>
-    <title>Warehouse Management System</title>
+
+    <link rel="icon" type="image/png" href="{{ asset('images/hoa-favicon.png') }}">
+    <title>HoA WMS</title>
 
     {{-- Vite Laravel --}}
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -54,7 +56,17 @@
      {{-- Sidebar --}}
     <div id="sidebar" class="sidebar bg-dark text-white p-3">
 
-        <h4>WMS</h4>
+        {{-- <img src="images/hoa-logo.png" alt="HoA WMS" style="width: 180px; height: auto;"> 
+        <h4>WMS</h4> --}}
+
+        <div class="text-center">
+            <img
+                src="{{ asset('images/hoa-logo.png') }}"
+                alt="HoA WMS"
+                style="width: 210px; height: auto;">
+        </div>
+        <br>
+        <div class="fw-bold mt-1 text-center">Warehouse Management System</div>
 
         <hr class="mt-9">
 
@@ -88,14 +100,14 @@
             <a href="/transactions-in"
             class="d-block text-success ms-3 mb-2 text-decoration-none">
 
-                Stock-in +
+                Stock-in 
 
             </a>
 
             <a href="/transactions-out"
             class="d-block text-danger ms-3 mb-2 text-decoration-none">
 
-                Stock-out -
+                Stock-out 
 
             </a>
 
@@ -113,7 +125,7 @@
         {{-- Return-Reviews --}}
         @if(auth()->user()->role == 'leader')
             <a href="/returns/review" class="d-block text-white text-decoration-none mb-2">
-                Returns review
+                Return reviews
             </a>
         @endif
 
