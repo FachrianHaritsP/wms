@@ -44,7 +44,7 @@ class   ReturnController extends Controller
         );
     }
 
-    //for flutter
+    
     public function apiIndex()
     {
         $returns = ReturnItem::with(

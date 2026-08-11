@@ -9,7 +9,7 @@ function resetCard(){
 
 function loadReturns(){
 
-    fetch('/returns')
+    fetch('api/returns') //pake api karena udh ada session dari login sebelumnya cuma pake web error
 
     .then(res => res.json())
 
