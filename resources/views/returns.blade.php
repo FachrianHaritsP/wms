@@ -87,7 +87,7 @@
         <div class="card p-3">
             <h5>Return History</h5>
             <div class="table-responsive">
-                <table class="table table-sm" id="returnTable">
+                <table class="table table-sm">
 
                     <thead>
 
@@ -104,7 +104,7 @@
 
                     </thead>
 
-                    <tbody>
+                    <tbody id="returnTable">
 
                         @forelse($returns as $return)
 

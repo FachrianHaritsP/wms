@@ -9,33 +9,46 @@ function resetCard(){
 
 function loadReturns(){
 
-    fetch('api/returns') //pake api karena udh ada session dari login sebelumnya cuma pake web error
+    fetch('/api/warehouse/returns') //pake api karena udh ada session dari login sebelumnya cuma pake web error
 
     .then(res => res.json())
-
     .then(data => {
 
-    console.log(data);
+    //console.log(data);
+    console.log('LOAD RETURNS:', data);
 
     let tbody = document.getElementById('returnTable');
-
     tbody.innerHTML = '';
-
         data.data.data.forEach(item => {
-
             tbody.innerHTML += `
             
             <tr>
-
                 <td>${item.product.name}</td>
-
                 <td>${item.qty}</td>
-
                 <td>${item.reason}</td>
-
                 <td>${item.status}</td>
-
                 <td>${item.user.name}</td>
+
+                <td>
+                    <button
+                        class="btn btn-warning btn-sm"
+                        onclick="editReturn(
+                            ${item.id},
+                            ${item.product_id},
+                            ${item.qty},
+                            '${item.reason}',
+                            '${item.notes ?? ''}'
+                        )">
+                        Edit
+                    </button>
+
+                    <button
+                        class="btn btn-danger btn-sm"
+                        onclick="cancelReturn(${item.id})">
+                        Cancel
+                    </button>
+
+                </td>
 
             </tr>
 
