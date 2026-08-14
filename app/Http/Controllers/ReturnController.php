@@ -65,11 +65,20 @@ class   ReturnController extends Controller
 
     public function store(Request $request)
     {
+
         $request->validate([
             'product_id' => 'required|exists:products,id',
             'qty' => 'required|integer|min:1',
-            'reason' => 'required'
+            'reason' => 'required|in:Barang Cacat,Barang Tidak Sesuai,Kemasan Rusak,Salah Pengiriman,Lainnya',
+            'notes' => 'nullable|string'
         ]);
+
+        if ($request->reason === 'Lainnya' && empty($request->notes)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Penjelasan wajib diisi jika alasan return adalah Lainnya'
+            ], 422);
+        }
 
         $return = ReturnItem::create([
             'product_id' => $request->product_id,
@@ -90,11 +99,6 @@ class   ReturnController extends Controller
     // blade return-review
     public function review()
     {
-        // $returns = ReturnItem::with('product','user')
-        //     ->latest()
-        //     ->paginate(10);
-
-        // return view('returns-review', compact('returns'));
 
         $pendingReturns = ReturnItem::with(
             'product',

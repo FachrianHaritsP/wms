@@ -15,14 +15,13 @@
             <thead class="table-dark">
                 
                 <tr>
-                    <th>SKU</th>
+                    <th class="d-none d-md-table-cell">SKU</th>
                     <th>Nama</th>
                     <th class="d-none d-md-table-cell">Ukuran</th>
                     <th class="d-none d-md-table-cell">Warna</th>
                     <th>Stock</th>
                     <th class="d-none d-md-table-cell">Lokasi</th>
                     <th>Aksi</th>
-                    <th class="d-none d-md-table-cell">QR</th>
                 </tr>
                            
             </thead>
@@ -148,29 +147,46 @@
 
                 <div class="modal-body">
 
-                    <p><b>SKU:</b>
+                    <p>
+                        <b>SKU:</b>
                         <span id="info_sku"></span>
                     </p>
 
-                    <p><b>Nama:</b>
+                    <p>
+                        <b>Nama:</b>
                         <span id="info_name"></span>
                     </p>
 
-                    <p><b>Ukuran:</b>
+                    <p>
+                        <b>Ukuran:</b>
                         <span id="info_size"></span>
                     </p>
 
-                    <p><b>Warna:</b>
+                    <p>
+                        <b>Warna:</b>
                         <span id="info_color"></span>
                     </p>
 
-                    <p><b>Stock:</b>
+                    <p>
+                        <b>Stock:</b>
                         <span id="info_stock"></span>
                     </p>
 
-                    <p><b>Lokasi:</b>
+                    <p>
+                        <b>Lokasi:</b>
                         <span id="info_location"></span>
                     </p>
+
+                    <hr>
+
+                    <div class="text-center">
+
+                        <h6>QR Produk</h6>
+
+                        <div id="info_qr" class="d-flex justify-content-center">
+                        </div>
+
+                    </div>
 
                 </div>
 

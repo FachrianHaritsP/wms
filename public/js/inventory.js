@@ -4,9 +4,6 @@ function loadProducts(page = 1, search = ''){
 
     table.innerHTML ='<tr><td colspan="8" class="text-center">Loading...</td></tr>';
 
-    //api
-    //fetch('/api/warehouse/products?page='+ page +'&search=' + search)
-    //web
     fetch('/inventory/products?page=' + page + '&search=' + search)
 
     .then(res => res.json())
@@ -24,7 +21,7 @@ function loadProducts(page = 1, search = ''){
             table.innerHTML += `
             <tr class="${stockClass}">
 
-                <td>${item.sku}</td>
+                <td class="d-none d-md-table-cell">${item.sku}</td>
 
                 <td>${item.name}</td>
 
@@ -44,48 +41,38 @@ function loadProducts(page = 1, search = ''){
                     : '-'}
                 </td>
 
-                <td>
-                    <button class="btn btn-warning btn-sm mt-1"
-                    onclick="openEditModal(${item.id})">
-                    ✏ Edit
-                    </button>
+                <td class="text-nowrap">
+                    <div class="d-flex flex-nowrap gap-1">
 
-                    <button class="btn btn-danger btn-sm mt-1"
-                    onclick="openDeleteModal(${item.id})">
-                    🗑 Delete
-                    </button>
-                    
-                    <button class="btn btn-info btn-sm mt-1"
-                    onclick="openInfoModal(${item.id})">
+                        <button
+                            class="btn btn-warning btn-sm"
+                            onclick="openEditModal(${item.id})"
+                            title="Edit">
+                            <span class="d-none d-md-inline">✏ Edit</span>
+                            <span class="d-inline d-md-none">✏</span>
+                        </button>
 
-                    ⓘ Info
+                        <button
+                            class="btn btn-danger btn-sm"
+                            onclick="openDeleteModal(${item.id})"
+                            title="Delete">
+                            <span class="d-none d-md-inline">🗑 Delete</span>
+                            <span class="d-inline d-md-none">🗑</span>
+                        </button>
 
-                    </button>
+                        <button
+                            class="btn btn-info btn-sm"
+                            onclick="openInfoModal(${item.id})"
+                            title="Info">
+                            <span class="d-none d-md-inline">ⓘ Info</span>
+                            <span class="d-inline d-md-none">ⓘ</span>
+                        </button>
+
+                    </div>
                 </td>
-
-                <td id="qr-${item.id}" class="d-none d-md-table-cell"></td>
 
             </tr>
             `;
-
-        });
-
-        data.forEach(item => {
-
-            fetch('/qr/' + encodeURIComponent(item.sku))
-
-            .then(res => res.text())
-
-            .then(svg => {
-
-                let qrEl =
-                document.getElementById('qr-' + item.id);
-
-                if(qrEl){
-                    qrEl.innerHTML = svg;
-                }
-
-            });
 
         });
 
@@ -273,6 +260,7 @@ function openEditModal(id){
         console.log(data)
 
     })
+
 }//end
 
 function openInfoModal(id){
@@ -310,6 +298,32 @@ function openInfoModal(id){
                     + '-' +
                     data.rack_slot.slot_code
                 : '-';
+
+        // QR
+        let qrEl =
+            document.getElementById('info_qr');
+
+        qrEl.innerHTML = 'Loading QR...';
+
+
+        fetch('/qr/' + encodeURIComponent(data.sku))
+
+            .then(res => res.text())
+
+            .then(svg => {
+
+                qrEl.innerHTML = svg;
+
+            })
+
+            .catch(() => {
+
+                qrEl.innerHTML =
+                    '<span class="text-danger">QR gagal dimuat</span>';
+
+            });
+
+
 
         new bootstrap.Modal(
             document.getElementById('infoModal')

@@ -34,11 +34,9 @@
 
                             <th>Product</th>
 
-                            <th class="d-none d-md-table-cell">
-                                Qty
-                            </th>
+                            <th>Qty</th>
 
-                            <th>Reason</th>
+                            <th class="d-none d-md-table-cell">Reason</th>
 
                             <th>Status</th>
 
@@ -80,7 +78,7 @@
                                         {{ $return->product->name }}
                                     </td>
 
-                                    <td class="d-none d-md-table-cell">
+                                    <td>
                                         {{ $return->qty }}
                                     </td>
 
@@ -88,7 +86,7 @@
                                         {{ $return->reason }}
                                     </td>
 
-                                    <td>
+                                    <td class="d-none d-md-table-cell">
                                         <span class="badge bg-warning text-dark">
                                             Pending
                                         </span>
@@ -98,9 +96,9 @@
                                         {{ $return->user->name }}
                                     </td>
 
-                                    <td class="text-nowrap">
+                                    <td>
 
-                                        <div class="d-flex gap-1">
+                                        <div class="d-flex flex-column gap-1">
 
                                             <form
                                                 action="/returns/{{ $return->id }}/approve"
@@ -112,7 +110,7 @@
 
                                                 <button
                                                     type="submit"
-                                                    class="btn btn-success btn-sm">
+                                                    class="btn btn-success btn-sm w-100">
 
                                                     Approve
 
@@ -131,7 +129,7 @@
 
                                                 <button
                                                     type="submit"
-                                                    class="btn btn-danger btn-sm">
+                                                    class="btn btn-danger btn-sm w-100">
 
                                                     Reject
 
@@ -180,13 +178,13 @@
 
                             <th>Product</th>
 
-                            <th class="d-none d-md-table-cell">
+                            <th>
                                 Qty
                             </th>
 
                             <th>Reason</th>
 
-                            <th>Status</th>
+                            <th class="d-none d-md-table-cell">Status</th>
 
                             <th class="d-none d-md-table-cell">
                                 User
@@ -222,7 +220,7 @@
                                         {{ $return->product->name }}
                                     </td>
 
-                                    <td class="d-none d-md-table-cell">
+                                    <td>
                                         {{ $return->qty }}
                                     </td>
 
@@ -230,7 +228,7 @@
                                         {{ $return->reason }}
                                     </td>
 
-                                    <td>
+                                    <td class="d-none d-md-table-cell"> 
 
                                         @if($return->status == 'cancelled')
 

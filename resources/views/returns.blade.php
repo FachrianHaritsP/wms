@@ -3,6 +3,7 @@
 
 @section('content')
 
+
 <div class="container-fluid">
 
     <h2 class="mt-2">Create Return</h2>
@@ -57,17 +58,56 @@
                 </div>
 
                 <div class="mb-3">
-                    <label>Reason</label>
-                    <textarea
-                        id="reason"
-                        class="form-control">Barang cacat</textarea>
+                    <label for="reason" class="form-label">
+                        Reason
+                    </label>
+
+                    <select id="reason" class="form-select">
+
+                        <option value="">
+                            Pilih alasan return
+                        </option>
+
+                        <option value="Barang Cacat">
+                            Barang Cacat
+                        </option>
+
+                        <option value="Barang Tidak Sesuai">
+                            Barang Tidak Sesuai
+                        </option>
+
+                        <option value="Kemasan Rusak">
+                            Kemasan Rusak
+                        </option>
+
+                        <option value="Salah Pengiriman">
+                            Salah Pengiriman
+                        </option>
+
+                        <option value="Lainnya">
+                            Lainnya
+                        </option>
+
+                    </select>
                 </div>
 
                 <div class="mb-3">
-                    <label>Notes</label>
+
+                    <label for="notes" class="form-label">
+                        Penjelasan
+                    </label>
+
                     <textarea
                         id="notes"
-                        class="form-control"></textarea>
+                        class="form-control"
+                        rows="3"
+                        placeholder="Jelaskan detail alasan return..."></textarea>
+
+                    <small class="text-muted">
+                        Jelaskan detail dari alasan yang dipilih.
+                        Wajib diisi jika memilih "Lainnya".
+                    </small>
+
                 </div>
 
                 <button
@@ -100,13 +140,13 @@
 
                                 <th>Product</th>
 
-                                <th class="d-none d-md-table-cell">
+                                <th>
                                     Qty
                                 </th>
 
                                 <th>Reason</th>
 
-                                <th>Status</th>
+                                <th class="d-none d-md-table-cell">Status</th>
 
                                 <th class="d-none d-md-table-cell">
                                     User
@@ -130,7 +170,7 @@
                                         {{ $return->product->name }}
                                     </td>
 
-                                    <td class="d-none d-md-table-cell">
+                                    <td>
                                         {{ $return->qty }}
                                     </td>
 
@@ -138,7 +178,7 @@
                                         {{ $return->reason }}
                                     </td>
 
-                                    <td>
+                                    <td class="d-none d-md-table-cell">
 
                                         @if($return->status == 'pending')
 
@@ -166,25 +206,29 @@
                                         {{ $return->user->name }}
                                     </td>
 
-                                    <td class="text-nowrap">
+                                    <td>
 
-                                        <button
-                                            class="btn btn-warning btn-sm me-1"
-                                            onclick="editReturn(
-                                                {{ $return->id }},
-                                                {{ $return->product_id }},
-                                                {{ $return->qty }},
-                                                '{{ $return->reason }}',
-                                                '{{ $return->notes }}'
-                                            )">
-                                            Edit
-                                        </button>
+                                        <div class="d-flex flex-column gap-1">
 
-                                        <button
-                                            class="btn btn-danger btn-sm"
-                                            onclick="cancelReturn({{ $return->id }})">
-                                            Cancel
-                                        </button>
+                                            <button
+                                                class="btn btn-warning btn-sm"
+                                                onclick="editReturn(
+                                                    {{ $return->id }},
+                                                    {{ $return->product_id }},
+                                                    {{ $return->qty }},
+                                                    '{{ $return->reason }}',
+                                                    '{{ $return->notes }}'
+                                                )">
+                                                Edit
+                                            </button>
+
+                                            <button
+                                                class="btn btn-danger btn-sm"
+                                                onclick="cancelReturn({{ $return->id }})">
+                                                Cancel
+                                            </button>
+
+                                        </div>
 
                                     </td>
 

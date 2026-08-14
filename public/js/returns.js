@@ -109,8 +109,15 @@ function submitReturn() {
         return;
     }
 
-    if(reason.trim() === ''){
-        alert('Reason wajib diisi');
+    if(reason === ''){
+        alert('Alasan return wajib dipilih');
+        btn.disabled = false;
+        btn.innerText = 'Submit Return';
+        return;
+    }
+
+    if(reason === 'Lainnya' && notes.trim() === ''){
+        alert('Penjelasan wajib diisi jika memilih Lainnya');
         btn.disabled = false;
         btn.innerText = 'Submit Return';
         return;
