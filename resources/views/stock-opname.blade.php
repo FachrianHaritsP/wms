@@ -146,10 +146,12 @@
                         </thead>
 
                         <tbody id="history_table">
-
                         </tbody>
 
                     </table>
+                    <div id="opnamePagination"
+                        class="d-flex justify-content-center mt-3">
+                    </div>
                 </div>
             </div>
 
@@ -242,7 +244,12 @@
                         </tbody>
 
                     </table>
-                    
+
+                    {{--  page --}}
+                    <div class="mt-3">
+                        {{ $returns->links() }}
+                    </div>
+                                        
                 </div>  
 
             </div> <! --sss -->

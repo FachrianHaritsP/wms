@@ -76,13 +76,13 @@ class StockOpnameController extends Controller
 
     }
 
-
+    //relate Item (Return)
     public function index()
     {
         $returns = ReturnItem::with('product')
                     ->whereIn('status', ['pending', 'rejected'])
                     ->latest()
-                    ->get();
+                    ->paginate(10);
 
         return view('stock-opname', compact('returns'));
     }
@@ -157,7 +157,7 @@ class StockOpnameController extends Controller
         ]);
     }
 
-
+    //history opname
     public function history(Request $request)
     {
         $query = StockOpnameDetail::with([
@@ -180,7 +180,7 @@ class StockOpnameController extends Controller
 
         $details = $query
             ->latest()
-            ->get();
+            ->paginate(10);
 
         return response()->json([
             'session_code' => $request->session_code, //buat sementar

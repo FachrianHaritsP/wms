@@ -16,7 +16,7 @@
 
         <div class="card-header">
             <strong>
-                Pending Approval ({{ $pendingReturns->count() }})
+                Pending Approval ({{ $pendingReturns->total() }}) 
             </strong>
         </div>
 
@@ -155,8 +155,18 @@
 
         </div>
 
-    </div>
+        <div class="mt-3">
 
+            <div class="text-center small text-muted mb-2">
+                Page {{ $pendingReturns->currentPage() }}
+                of {{ $pendingReturns->lastPage() }}
+            </div>
+
+            {{ $pendingReturns->links() }}
+
+        </div>
+
+    </div>
 
     {{-- ========================= --}}
     {{-- RETURN HISTORY --}}
@@ -178,13 +188,13 @@
 
                             <th>Product</th>
 
-                            <th>
+                            <th class="d-none d-md-table-cell">
                                 Qty
                             </th>
 
                             <th>Reason</th>
 
-                            <th class="d-none d-md-table-cell">Status</th>
+                            <th>Status</th>
 
                             <th class="d-none d-md-table-cell">
                                 User
@@ -220,7 +230,7 @@
                                         {{ $return->product->name }}
                                     </td>
 
-                                    <td>
+                                    <td class="d-none d-md-table-cell">
                                         {{ $return->qty }}
                                     </td>
 
@@ -228,7 +238,7 @@
                                         {{ $return->reason }}
                                     </td>
 
-                                    <td class="d-none d-md-table-cell"> 
+                                    <td> 
 
                                         @if($return->status == 'cancelled')
 
@@ -274,8 +284,12 @@
 
             </div>
 
-
             <div class="mt-3">
+
+                <div class="text-center small text-muted mb-2">
+                    Page {{ $historyReturns->currentPage() }}
+                    of {{ $historyReturns->lastPage() }}
+                </div>
 
                 {{ $historyReturns->links() }}
 

@@ -19,7 +19,7 @@ class   ReturnController extends Controller
     // 🔵 approve()   Web Only
     // 🔵 reject()    Web Only
 
-    //for web
+    //for web return
     public function index()
     {
         $returns = ReturnItem::with(
@@ -44,25 +44,28 @@ class   ReturnController extends Controller
         );
     }
 
-    
+    //api
     public function apiIndex()
     {
         $returns = ReturnItem::with(
             'product',
             'user'
         )
+        ->where(
+            'status',
+            'pending'
+        )
         ->latest()
         ->paginate(10);
 
         return response()->json([
-
             'success' => true,
             'message' => 'Returns fetched',
             'data' => $returns
-
         ]);
     }
 
+    
     public function store(Request $request)
     {
 
@@ -99,6 +102,7 @@ class   ReturnController extends Controller
     // blade return-review
     public function review()
     {
+        $page = request()->get('page', 1);
 
         $pendingReturns = ReturnItem::with(
             'product',
@@ -111,8 +115,8 @@ class   ReturnController extends Controller
         )
 
         ->latest()
-
-        ->get();
+        ->paginate(10, ['*'], 'page', $page);
+        
 
         $historyReturns = ReturnItem::with(
         'product',
@@ -129,8 +133,7 @@ class   ReturnController extends Controller
         )
 
         ->latest()
-
-        ->paginate(10);
+        ->paginate(10, ['*'], 'page', $page);
 
         return view(
         'returns-review',

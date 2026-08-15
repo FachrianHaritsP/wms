@@ -15,6 +15,35 @@ function loadProducts(page = 1, search = ''){
 
         data.forEach(item => {
 
+            let actionButtons = '';
+
+            if (userRole === 'owner' || userRole === 'leader') {
+
+                actionButtons += `
+                    <button
+                        class="btn btn-warning btn-sm"
+                        onclick="openEditModal(${item.id})">
+                        ✏ Edit
+                    </button>
+
+                    <button
+                        class="btn btn-danger btn-sm"
+                        onclick="openDeleteModal(${item.id})">
+                        🗑 Delete
+                    </button>
+                `;
+
+            }
+
+            actionButtons += `
+                <button
+                    class="btn btn-info btn-sm"
+                    onclick="openInfoModal(${item.id})">
+                    ⓘ Info
+                </button>
+            `;
+
+
             let stockClass =
             item.stock <= 5 ? 'table-danger' : '';
 
@@ -43,31 +72,7 @@ function loadProducts(page = 1, search = ''){
 
                 <td class="text-nowrap">
                     <div class="d-flex flex-nowrap gap-1">
-
-                        <button
-                            class="btn btn-warning btn-sm"
-                            onclick="openEditModal(${item.id})"
-                            title="Edit">
-                            <span class="d-none d-md-inline">✏ Edit</span>
-                            <span class="d-inline d-md-none">✏</span>
-                        </button>
-
-                        <button
-                            class="btn btn-danger btn-sm"
-                            onclick="openDeleteModal(${item.id})"
-                            title="Delete">
-                            <span class="d-none d-md-inline">🗑 Delete</span>
-                            <span class="d-inline d-md-none">🗑</span>
-                        </button>
-
-                        <button
-                            class="btn btn-info btn-sm"
-                            onclick="openInfoModal(${item.id})"
-                            title="Info">
-                            <span class="d-none d-md-inline">ⓘ Info</span>
-                            <span class="d-inline d-md-none">ⓘ</span>
-                        </button>
-
+                        ${actionButtons}
                     </div>
                 </td>
 
@@ -94,9 +99,8 @@ function loadProducts(page = 1, search = ''){
 
             `;
 
-            return;
-
         }
+        renderProductPagination(response.data);
 
     });
 
@@ -428,3 +432,67 @@ document.addEventListener('DOMContentLoaded', function(){
     })
 
 })
+
+function renderProductPagination(meta){
+
+    let container =
+        document.getElementById('productPagination');
+
+    container.innerHTML = '';
+
+    if(meta.last_page <= 1){
+        return;
+    }
+
+    let html = `
+        <div class="btn-group">
+    `;
+
+    html += `
+        <button
+            class="btn btn-outline-primary btn-sm"
+            ${meta.current_page === 1 ? 'disabled' : ''}
+            onclick="loadProducts(
+                ${meta.current_page - 1},
+                '${document.getElementById('search').value}'
+            )">
+            Previous
+        </button>
+    `;
+
+    for(let page = 1; page <= meta.last_page; page++){
+
+        html += `
+            <button
+                class="btn ${
+                    page === meta.current_page
+                        ? 'btn-primary'
+                        : 'btn-outline-primary'
+                } btn-sm"
+                onclick="loadProducts(
+                    ${page},
+                    '${document.getElementById('search').value}'
+                )">
+                ${page}
+            </button>
+        `;
+    }
+
+    html += `
+        <button
+            class="btn btn-outline-primary btn-sm"
+            ${meta.current_page === meta.last_page ? 'disabled' : ''}
+            onclick="loadProducts(
+                ${meta.current_page + 1},
+                '${document.getElementById('search').value}'
+            )">
+            Next
+        </button>
+    `;
+
+    html += `</div>`;
+
+    container.innerHTML = html;
+}
+
+loadProducts();

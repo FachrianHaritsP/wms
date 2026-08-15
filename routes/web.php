@@ -62,7 +62,7 @@ Route::middleware('auth')->group(function () {
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth', 'role:owner,leader'])->group(function () {
+Route::middleware(['auth', 'role:owner,leader,staff'])->group(function () {
 
     Route::get('/inventory', function () {
         $rackSlots = RackSlot::with('rack')->get();

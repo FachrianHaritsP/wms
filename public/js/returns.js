@@ -7,58 +7,102 @@ function resetCard(){
     document.getElementById('notes').value = '';
 }
 
-function loadReturns(){
+function loadReturns(page = 1) {
 
-    fetch('/api/warehouse/returns') //pake api karena udh ada session dari login sebelumnya cuma pake web error
+     //console.log('LOAD RETURNS RUNNING', page);
+    fetch('/api/warehouse/returns?page=' + page)
 
     .then(res => res.json())
     .then(data => {
 
-    //console.log(data);
-    console.log('LOAD RETURNS:', data);
+        let tbody =
+            document.getElementById('returnTable');
 
-    let tbody = document.getElementById('returnTable');
-    tbody.innerHTML = '';
+        tbody.innerHTML = '';
+
+        if (data.data.data.length === 0) {
+
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6"
+                            class="text-center text-muted py-3">
+                            Belum ada data return.
+                        </td>
+                    </tr>
+                `;
+
+                } else {
+
+
         data.data.data.forEach(item => {
+
+            let statusBadge = `
+                <span class="badge bg-warning text-dark">
+                    Pending
+                </span>
+            `;
+
             tbody.innerHTML += `
-            
-            <tr>
-                <td>${item.product.name}</td>
-                <td>${item.qty}</td>
-                <td>${item.reason}</td>
-                <td>${item.status}</td>
-                <td>${item.user.name}</td>
+                <tr>
 
-                <td>
-                    <button
-                        class="btn btn-warning btn-sm"
-                        onclick="editReturn(
-                            ${item.id},
-                            ${item.product_id},
-                            ${item.qty},
-                            '${item.reason}',
-                            '${item.notes ?? ''}'
-                        )">
-                        Edit
-                    </button>
+                    <td>
+                        ${item.product.name}
+                    </td>
 
-                    <button
-                        class="btn btn-danger btn-sm"
-                        onclick="cancelReturn(${item.id})">
-                        Cancel
-                    </button>
+                    <td>
+                        ${item.qty}
+                    </td>
 
-                </td>
+                    <td>
+                        ${item.reason}
+                    </td>
 
-            </tr>
+                    <td class="d-none d-md-table-cell">
+                        ${statusBadge}
+                    </td>
 
+                    <td class="d-none d-md-table-cell">
+                        ${item.user.name}
+                    </td>
+
+                    <td>
+
+                        <div class="d-flex flex-column gap-1">
+
+                            <button
+                                class="btn btn-warning btn-sm"
+                                onclick="editReturn(
+                                    ${item.id},
+                                    ${item.product_id},
+                                    ${item.qty},
+                                    '${item.reason}',
+                                    '${item.notes ?? ''}'
+                                )">
+                                Edit
+                            </button>
+
+                            <button
+                                class="btn btn-danger btn-sm"
+                                onclick="cancelReturn(${item.id})">
+                                Cancel
+                            </button>
+
+                        </div>
+
+                    </td>
+
+                </tr>
             `;
 
         });
+        }
+        renderReturnPagination(data.data);
 
-    })
+    });
+
 
 }
+
 
 function submitReturn() {
 
@@ -353,3 +397,58 @@ function editReturn(id,productId,qty,reason, notes){
     ).value = notes;
 
 }
+
+function renderReturnPagination(meta){
+
+    let container =
+        document.getElementById('returnPagination');
+
+    container.innerHTML = '';
+
+    if(meta.last_page <= 1){
+        return;
+    }
+
+    let html = `
+        <div class="btn-group">
+    `;
+
+    html += `
+        <button
+            class="btn btn-outline-primary btn-sm"
+            ${meta.current_page === 1 ? 'disabled' : ''}
+            onclick="loadReturns(${meta.current_page - 1})">
+            Previous
+        </button>
+    `;
+
+    for(let page = 1; page <= meta.last_page; page++){
+
+        html += `
+            <button
+                class="btn ${
+                    page === meta.current_page
+                        ? 'btn-primary'
+                        : 'btn-outline-primary'
+                } btn-sm"
+                onclick="loadReturns(${page})">
+                ${page}
+            </button>
+        `;
+    }
+
+    html += `
+        <button
+            class="btn btn-outline-primary btn-sm"
+            ${meta.current_page === meta.last_page ? 'disabled' : ''}
+            onclick="loadReturns(${meta.current_page + 1})">
+            Next
+        </button>
+    `;
+
+    html += `</div>`;
+
+    container.innerHTML = html;
+}
+
+loadReturns();

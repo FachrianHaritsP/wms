@@ -56,14 +56,15 @@
      {{-- Sidebar --}}
     <div id="sidebar" class="sidebar bg-dark text-white p-3">
 
-        {{-- <img src="images/hoa-logo.png" alt="HoA WMS" style="width: 180px; height: auto;"> 
-        <h4>WMS</h4> --}}
-
         <div class="text-center">
-            <img
-                src="{{ asset('images/hoa-logo.png') }}"
-                alt="HoA WMS"
-                style="width: 210px; height: auto;">
+            <a href="{{ auth()->user()->role === 'staff'
+                ? url('/inventory')
+                : url('/dashboard') }}">
+                <img
+                    src="{{ asset('images/hoa-logo.png') }}"
+                    alt="HoA WMS"
+                    style="width: 210px; height: auto;">
+            </a>
         </div>
         <br>
         <div class="fw-bold mt-1 text-center">Warehouse Management System</div>
@@ -79,7 +80,7 @@
         @endif
 
         {{-- INVENTORY --}}
-        @if(in_array(auth()->user()->role ,['owner','leader']))
+        @if(in_array(auth()->user()->role ,['owner','leader','staff']))
             <a href="/inventory" class="d-block text-white text-decoration-none mb-2">
                 Inventory
             </a>

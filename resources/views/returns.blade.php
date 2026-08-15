@@ -15,6 +15,9 @@
 
             <div class="card p-3">
 
+                <h3 id="returnsTitle" class="mb-3"> Create </h3>
+
+
                 <div class="mb-3">
                     <label>Product</label>
 
@@ -140,9 +143,7 @@
 
                                 <th>Product</th>
 
-                                <th>
-                                    Qty
-                                </th>
+                                <th> Qty </th>
 
                                 <th>Reason</th>
 
@@ -162,98 +163,16 @@
 
                         <tbody id="returnTable">
 
-                            @forelse($returns as $return)
-
-                                <tr>
-
-                                    <td>
-                                        {{ $return->product->name }}
-                                    </td>
-
-                                    <td>
-                                        {{ $return->qty }}
-                                    </td>
-
-                                    <td>
-                                        {{ $return->reason }}
-                                    </td>
-
-                                    <td class="d-none d-md-table-cell">
-
-                                        @if($return->status == 'pending')
-
-                                            <span class="badge bg-warning text-dark">
-                                                Pending
-                                            </span>
-
-                                        @elseif($return->status == 'rejected')
-
-                                            <span class="badge bg-danger">
-                                                Rejected
-                                            </span>
-
-                                        @elseif($return->status == 'approved')
-
-                                            <span class="badge bg-success">
-                                                Approved
-                                            </span>
-
-                                        @endif
-
-                                    </td>
-
-                                    <td class="d-none d-md-table-cell">
-                                        {{ $return->user->name }}
-                                    </td>
-
-                                    <td>
-
-                                        <div class="d-flex flex-column gap-1">
-
-                                            <button
-                                                class="btn btn-warning btn-sm"
-                                                onclick="editReturn(
-                                                    {{ $return->id }},
-                                                    {{ $return->product_id }},
-                                                    {{ $return->qty }},
-                                                    '{{ $return->reason }}',
-                                                    '{{ $return->notes }}'
-                                                )">
-                                                Edit
-                                            </button>
-
-                                            <button
-                                                class="btn btn-danger btn-sm"
-                                                onclick="cancelReturn({{ $return->id }})">
-                                                Cancel
-                                            </button>
-
-                                        </div>
-
-                                    </td>
-
-                                </tr>
-
-                            @empty
-
-                                <tr>
-
-                                    <td
-                                        colspan="6"
-                                        class="text-center text-muted py-3">
-
-                                        Belum ada data return.
-
-                                    </td>
-
-                                </tr>
-
-                            @endforelse
-
                         </tbody>
 
                     </table>
 
+                </div>
+
+                  {{-- page --}}
+                <div id="returnPagination" 
+                    class="d-flex justify-content-center mt-3">
+                
                 </div>
 
             </div>

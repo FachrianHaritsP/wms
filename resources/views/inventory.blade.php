@@ -7,9 +7,12 @@
     <!--Search + Add -->
         <div class="d-flex flex-column flex-md-row justify-content-between gap-2 mb-3">
             <input type="text" id="search" class="form-control" placeholder="Cari SKU / Nama">
+        </div>
+    @if(in_array(auth()->user()->role, ['owner', 'leader']))
+        <div class="d-flex flex-column flex-md-row justify-content-between gap-2 mb-3">
             <button class="btn btn-primary w-100" onclick="openAddModal()">Tambah Produk</button>
         </div>
-
+    @endif
         {{-- tabel --}}
         <table class="table table-bordered table-striped table-sm small">
             <thead class="table-dark">
@@ -29,6 +32,9 @@
             <tbody id="product_table"></tbody>
 
         </table>
+        <div id="productPagination"
+            class="d-flex justify-content-center mt-3">
+        </div>
 
         <!-- Modal -->
     <div class="modal fade" id="productModal" tabindex="-1">
@@ -198,7 +204,9 @@
 
 </div>
  
-
+<script>
+    const userRole = @json(auth()->user()->role);
+</script>
 <script src="/js/inventory.js"></script>
 
 @endsection

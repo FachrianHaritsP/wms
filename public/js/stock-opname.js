@@ -256,22 +256,19 @@ function saveOpname(){
 
 }
 
-   // 
-   //${item.user.name} 
-   //${item.match_status}
-function refreshOpnameHistory(){
 
-    console.log('Session ' + opnameSession);
+function refreshOpnameHistory(page = 1){
 
     fetch(
-    '/warehouse/stock-opname/history?session_code='
-    + opnameSession)
+        '/warehouse/stock-opname/history?session_code='
+        + opnameSession
+        + '&page='
+        + page
+    )
 
     .then(res => res.json())
 
     .then(result => {
-
-        console.log(result);
 
         let table =
             document.getElementById(
@@ -280,7 +277,25 @@ function refreshOpnameHistory(){
 
         table.innerHTML = '';
 
-        result.data.forEach(item => {
+        let data = result.data.data;
+
+
+        if(data.length === 0){
+
+            table.innerHTML = `
+                <tr>
+                    <td colspan="6"
+                        class="text-center text-muted py-3">
+                        Belum ada history opname.
+                    </td>
+                </tr>
+            `;
+
+            return;
+        }
+
+
+        data.forEach(item => {
 
             let totalProducts =
                 document.getElementById(
@@ -290,17 +305,18 @@ function refreshOpnameHistory(){
             document.getElementById(
                 'counter'
             ).innerText =
-            'Items Checked : '
-            + result.data.length
-            + '/'
-            + totalProducts;
+                'Items Checked : '
+                + result.data.total
+                + '/'
+                + totalProducts;
 
-             let statusBadge = '';
 
-            if( item.match_status  === 'match'){ //item.match_status | item.status
+            let statusBadge = '';
+
+            if(item.match_status === 'match'){
 
                 statusBadge = `
-                    <span class="bg-green-200 px-2 py-1 rounded">
+                    <span class="badge bg-success">
                         Match
                     </span>
                 `;
@@ -308,51 +324,55 @@ function refreshOpnameHistory(){
             }else{
 
                 statusBadge = `
-                    <span class="bg-red-200 px-2 py-1 rounded">
+                    <span class="badge bg-danger">
                         Discrepancy
                     </span>
                 `;
 
             }
 
+
             table.innerHTML += `
 
-            <tr>
+                <tr>
 
-                <td class="border px-2 py-2"> 
-                    ${item.product.name} 
-                </td>
+                    <td class="border px-2 py-2">
+                        ${item.product.name}
+                    </td>
 
-                <td class="border px-2 py-2">
-                    ${item.system_stock}
-                </td>
+                    <td class="border px-2 py-2">
+                        ${item.system_stock}
+                    </td>
 
-                <td class="border px-2 py-2">
-                    ${item.physical_stock}
-                </td>
+                    <td class="border px-2 py-2">
+                        ${item.physical_stock}
+                    </td>
 
-                <td class="border px-2 py-2 d-none d-md-table-cell">
-                    ${item.difference}
-                </td>
+                    <td class="border px-2 py-2 d-none d-md-table-cell">
+                        ${item.difference}
+                    </td>
 
-                <td class="border px-2 py-2">
-                    ${statusBadge}
-                </td>
+                    <td class="border px-2 py-2">
+                        ${statusBadge}
+                    </td>
 
-                <td class="border px-2 py-2 d-none d-md-table-cell">
-                    
-                    ${item.session.user.name} 
-                </td>
+                    <td class="border px-2 py-2 d-none d-md-table-cell">
+                        ${item.session.user.name}
+                    </td>
 
-            </tr>
+                </tr>
 
             `;
 
         });
 
+
+        renderOpnamePagination(result.data);
+
     });
 
 }
+
 
 function openCamera(){
 
@@ -516,6 +536,62 @@ function selectProduct(){
 
     loadProductDetail(id);
 
+}
+
+function renderOpnamePagination(meta){
+
+    let container =
+        document.getElementById('opnamePagination');
+
+    container.innerHTML = '';
+
+    if(meta.last_page <= 1){
+        return;
+    }
+
+    let html = `
+        <div class="btn-group">
+    `;
+
+    html += `
+        <button
+            class="btn btn-outline-primary btn-sm"
+            ${meta.current_page === 1 ? 'disabled' : ''}
+            onclick="refreshOpnameHistory(${meta.current_page - 1})">
+            Previous
+        </button>
+    `;
+
+    for(let page = 1; page <= meta.last_page; page++){
+
+        html += `
+            <button
+                class="btn ${
+                    page === meta.current_page
+                        ? 'btn-primary'
+                        : 'btn-outline-primary'
+                } btn-sm"
+                onclick="refreshOpnameHistory(${page})">
+
+                ${page}
+
+            </button>
+        `;
+
+    }
+
+    html += `
+        <button
+            class="btn btn-outline-primary btn-sm"
+            ${meta.current_page === meta.last_page ? 'disabled' : ''}
+            onclick="refreshOpnameHistory(${meta.current_page + 1})">
+            Next
+        </button>
+    `;
+
+    html += `</div>`;
+
+    container.innerHTML = html;
 }
 
 loadProducts();
