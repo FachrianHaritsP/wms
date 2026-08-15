@@ -112,6 +112,7 @@ Route::middleware(['auth', 'role:leader,staff'])->group(function () {
 
     Route::get('/returns', [ReturnController::class, 'index']);
     Route::post('/returns', [ReturnController::class, 'store']);
+    Route::get('/returns/data', [ReturnController::class, 'apiIndex']);
     Route::put('/returns/{id}', [ReturnController::class, 'update']);
     Route::post('/returns/{id}/cancel', [ReturnController::class, 'cancel']);
     Route::get('/returns/review', [ReturnController::class, 'review']);

@@ -10,7 +10,7 @@ function resetCard(){
 function loadReturns(page = 1) {
 
      //console.log('LOAD RETURNS RUNNING', page);
-    fetch('/api/warehouse/returns?page=' + page)
+    fetch('/returns/data?page=' + page)
 
     .then(res => res.json())
     .then(data => {

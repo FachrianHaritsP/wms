@@ -261,7 +261,7 @@ function refreshOpnameHistory(page = 1){
 
     fetch(
         '/warehouse/stock-opname/history?session_code='
-        + opnameSession
+        + encodeURIComponent(opnameSession)
         + '&page='
         + page
     )
@@ -271,15 +271,27 @@ function refreshOpnameHistory(page = 1){
     .then(result => {
 
         let table =
-            document.getElementById(
-                'history_table'
-            );
+            document.getElementById('history_table');
 
         table.innerHTML = '';
 
+        // Data dari Laravel paginate()
         let data = result.data.data;
 
+        // Total produk dalam sesi opname
+        let totalProducts =
+            document.getElementById('total_products').value;
 
+        // Counter tetap berdasarkan TOTAL data,
+        // bukan jumlah data pada halaman
+        document.getElementById('counter').innerText =
+            'Items Checked : '
+            + result.data.total
+            + '/'
+            + totalProducts;
+
+
+        // Jika tidak ada history
         if(data.length === 0){
 
             table.innerHTML = `
@@ -291,25 +303,14 @@ function refreshOpnameHistory(page = 1){
                 </tr>
             `;
 
+            renderOpnamePagination(result.data);
+
             return;
         }
 
 
+        // Render history
         data.forEach(item => {
-
-            let totalProducts =
-                document.getElementById(
-                    'total_products'
-                ).value;
-
-            document.getElementById(
-                'counter'
-            ).innerText =
-                'Items Checked : '
-                + result.data.total
-                + '/'
-                + totalProducts;
-
 
             let statusBadge = '';
 
@@ -366,7 +367,7 @@ function refreshOpnameHistory(page = 1){
 
         });
 
-
+        // Pagination
         renderOpnamePagination(result.data);
 
     });
