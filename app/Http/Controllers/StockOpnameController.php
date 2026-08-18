@@ -57,11 +57,6 @@ class StockOpnameController extends Controller
         ->first();
 
           if (!$session) {
-            // return response()->json([
-            //     'success' => false,
-            //     'message' => 'Tidak ada session aktif.'
-            // ], 404);
-
             return response()->json([
                 'success' => false,
                 'message' => 'Tidak ada session aktif.'

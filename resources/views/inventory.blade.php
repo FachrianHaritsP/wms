@@ -183,6 +183,8 @@
                         <span id="info_location"></span>
                     </p>
 
+                  
+
                     <hr>
 
                     <div class="text-center">
@@ -191,8 +193,12 @@
 
                         <div id="info_qr" class="d-flex justify-content-center">
                         </div>
-
-                    </div>
+                      
+                        <button type="button" class="btn btn-info btn-sm mt-6" onclick="openPrintModal()">
+                            Print QR
+                        </button>
+                   
+                    </div> 
 
                 </div>
 
@@ -201,6 +207,81 @@
         </div>
 
     </div>{{-- end info modal --}}
+
+    {{-- Print QR Modal --}}
+    <div class="modal fade"
+        id="printModal"
+        tabindex="-1">
+
+        <div class="modal-dialog">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+
+                    <h5 class="modal-title">
+                        Print QR
+                    </h5>
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal">
+                    </button>
+
+                </div>
+
+                <div class="modal-body">
+
+                    <p>
+                        <b>Produk:</b>
+                        <span id="print_product_name"></span>
+                    </p>
+
+                    <div class="mb-3">
+
+                        <label for="print_qty"
+                            class="form-label">
+                            Jumlah QR
+                        </label>
+
+                        <input
+                            type="number"
+                            id="print_qty"
+                            class="form-control"
+                            min="1"
+                            value="1">
+
+                    </div>
+
+                    <small class="text-muted">
+                        Maksimal 30 QR per lembar A4.
+                    </small>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+
+                    <button
+                        type="button"
+                        class="btn btn-primary"
+                        onclick="printQR()">
+                        🖨 Print
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div> {{-- end print modal --}}
 
 </div>
  

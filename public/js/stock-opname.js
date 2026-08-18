@@ -30,7 +30,6 @@ if(opnameSession){
 
 function checkActiveSession(){
 
-
     fetch(
         '/warehouse/stock-opname/active'
     )
@@ -100,7 +99,6 @@ function checkActiveSession(){
         `;
     }
     });
-
 
 }
 

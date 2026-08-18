@@ -1,3 +1,5 @@
+let printProduct = null;
+
 function loadProducts(page = 1, search = ''){
 
     let table = document.getElementById('product_table');
@@ -279,6 +281,7 @@ function openInfoModal(id){
     .then(response => {
 
         let data = response.data;
+        printProduct = data;
 
         document.getElementById('info_sku')
             .innerText = data.sku;
@@ -329,6 +332,8 @@ function openInfoModal(id){
 
 
 
+        
+
         new bootstrap.Modal(
             document.getElementById('infoModal')
         ).show();
@@ -336,6 +341,280 @@ function openInfoModal(id){
     });
 
 }//end
+
+function openPrintModal(){
+
+    if(!printProduct){
+        return;
+    }
+
+    document.getElementById(
+        'print_product_name'
+    ).innerText = printProduct.name;
+
+    document.getElementById(
+        'print_qty'
+    ).value = 1;
+
+    const infoModal =
+        bootstrap.Modal.getInstance(
+            document.getElementById('infoModal')
+        );
+
+    if(infoModal){
+        infoModal.hide();
+    }
+
+    const printModal =
+        new bootstrap.Modal(
+            document.getElementById('printModal')
+        );
+
+    printModal.show();
+
+}//end print
+
+function printQR(){
+
+    if(!printProduct){
+        return;
+    }
+
+    let qty = parseInt(
+        document.getElementById('print_qty').value
+    );
+
+    if(!qty || qty < 1){
+        alert('Jumlah QR minimal 1.');
+        return;
+    }
+
+    // Buka window print sejak klik user
+    // supaya tidak dianggap popup oleh browser
+    let printWindow = window.open('', '_blank');
+
+    if(!printWindow){
+        alert('Popup diblokir oleh browser.');
+        return;
+    }
+
+    // Ambil QR dari server
+    fetch(
+        '/qr/' +
+        encodeURIComponent(printProduct.sku)
+    )
+
+    .then(res => res.text())
+
+    .then(svg => {
+
+        let pages = '';
+
+        // 20 QR per A4
+        for(let i = 0; i < qty; i += 30){
+
+            let pageItems = '';
+
+            let pageQty =
+                Math.min(30, qty - i);
+
+            for(let j = 0; j < pageQty; j++){
+
+                pageItems += `
+                    <div class="qr-item">
+
+                        <div class="qr-name">
+                            ${printProduct.name}
+                        </div>
+
+                        <div class="qr-detail">
+                            ${printProduct.size} | ${printProduct.color}
+                        </div>
+
+                        <div class="qr-code">
+                            ${svg}
+                        </div>
+
+                    </div>
+                `;
+
+            }
+
+            pages += `
+                <div class="a4-page">
+                    ${pageItems}
+                </div>
+            `;
+
+        }
+
+        printWindow.document.write(`
+
+            <!DOCTYPE html>
+
+            <html>
+
+            <head>
+
+                <title>
+                    Print QR - ${printProduct.name}
+                </title>
+
+                <style>
+
+                    * {
+                        box-sizing: border-box;
+                    }
+
+                    @page {
+                        size: A4 portrait;
+                        margin: 0;
+                    }
+
+                    html,
+                    body {
+                        margin: 0;
+                        padding: 0;
+                    }
+
+                    body {
+                        font-family: Arial, sans-serif;
+                    }
+
+                    .a4-page {
+
+                        width: 210mm;
+                        height: 297mm;
+
+                        padding: 10mm;
+
+                        display: grid;
+
+                        grid-template-columns:
+                            repeat(5, 1fr);
+
+                        grid-template-rows:
+                            repeat(6, 1fr);
+
+                        gap: 2mm;
+
+                        page-break-after: always;
+
+                    }
+
+                    .a4-page:last-child {
+                        page-break-after: auto;
+                    }
+
+                    .qr-item {
+
+                        display: flex;
+
+                        flex-direction: column;
+
+                        align-items: center;
+
+                        justify-content: center;
+
+                        text-align: center;
+
+                        overflow: hidden;
+
+                    }
+
+                    .qr-name {
+
+                        font-size: 10pt;
+
+                        font-weight: 600;
+
+                        margin-bottom: 2mm;
+
+                        max-width: 42mm;
+
+                        overflow: hidden;
+
+                        white-space: nowrap;
+
+                        text-overflow: ellipsis;
+
+                    }
+
+                    .qr-detail {
+                        font-size: 8pt;
+                        margin-bottom: 2mm;
+                        white-space: nowrap;
+                    }
+
+                    .qr-code {
+
+                        width: 20mm;
+
+                        height: 20mm;
+
+                        display: flex;
+
+                        align-items: center;
+
+                        justify-content: center;
+
+                    }
+
+                    .qr-code svg {
+
+                        width: 20mm;
+
+                        height: 20mm;
+
+                        display: block;
+
+                    }
+
+                </style>
+
+            </head>
+
+            <body>
+
+                ${pages}
+
+                <script>
+
+                    window.onload = function(){
+
+                        window.focus();
+
+                        window.print();
+
+                        setTimeout(function(){
+                            window.close();
+                        }, 500);
+
+                    };
+
+                <\/script>
+
+            </body>
+
+            </html>
+
+        `);
+
+        printWindow.document.close();
+
+    })
+
+    .catch(error => {
+
+        printWindow.close();
+
+        console.error(error);
+
+        alert('Gagal membuat QR untuk dicetak.');
+
+    });
+
+}//end printqr
 
 function openDeleteModal(id){
 
