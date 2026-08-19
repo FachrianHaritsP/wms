@@ -2,8 +2,16 @@
 
 @section('content')
 <div class="table-responsive">
-    <h2 class="mt-2">Inventori</h2>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Inventori</h2>
 
+    <button
+        type="button"
+        class="btn btn-primary"
+        onclick="openPrintQueueModal()">
+        🖨 Print
+    </button>
+</div>
     <!--Search + Add -->
         <div class="d-flex flex-column flex-md-row justify-content-between gap-2 mb-3">
             <input type="text" id="search" class="form-control" placeholder="Cari SKU / Nama">
@@ -210,6 +218,13 @@
 
                         <div id="info_qr" class="d-flex justify-content-center">
                         </div>
+
+                        <button
+                            type="button"
+                            class="btn btn-success btn-sm mt-6"
+                            onclick="addToPrintQueue()">
+                            Tambah ke Print
+                        </button>
                       
                         <button type="button" class="btn btn-info btn-sm mt-6" onclick="openPrintModal()">
                             Print QR
@@ -304,6 +319,61 @@
         </div>
 
     </div> {{-- end print modal --}}
+
+    {{-- Queue print modal --}}
+    <div class="modal fade" id="printQueueModal" tabindex="-1">
+
+        <div class="border-top mt-3 pt-3 text-end">
+            <strong>Total QR: <span id="printQueueTotal">0</span></strong>
+        </div>
+
+        <div class="modal-dialog modal-lg">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+
+                    <h5 class="modal-title">
+                        Daftar Print QR
+                    </h5>
+
+                    <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal">
+                    </button>
+
+                </div>
+
+                <div class="modal-body">
+
+                    <div id="printQueueList"></div>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+
+                    <button
+                        type="button"
+                        class="btn btn-primary"
+                        onclick="printAllQueue()">
+                        🖨 Print Semua
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div> {{-- End Queue Print Modal --}}
 
 </div>
  

@@ -1,4 +1,5 @@
 let printProduct = null;
+let printQueue = [];
 
 function loadProducts(page = 1, search = ''){
 
@@ -645,6 +646,408 @@ function printQR(){
     });
 
 }//end printqr
+
+// queue print
+function openPrintQueueModal(){
+
+    renderPrintQueue();
+
+    new bootstrap.Modal(
+        document.getElementById('printQueueModal')
+    ).show();
+
+}//end
+
+function addToPrintQueue(){
+
+    if(!printProduct){
+        return;
+    }
+
+    printQueue.push({
+        product: printProduct,
+        qty: 1
+    });
+
+    alert('Produk ditambahkan ke daftar print.');
+
+}//end
+
+//fungsi queue render
+function renderPrintQueue(){
+
+    const list = document.getElementById('printQueueList');
+
+    if(printQueue.length === 0){
+        list.innerHTML = `
+            <div class="text-center text-muted py-3">
+                Belum ada produk.
+            </div>
+        `;
+        document.getElementById('printQueueTotal')
+        .innerText = 0;
+
+        return;
+    }
+
+    let total = printQueue.reduce(
+    (sum, item) => sum + item.qty,
+    0
+    );
+
+    document.getElementById('printQueueTotal')
+        .innerText = total;
+
+    list.innerHTML = printQueue.map((item, index) => `
+        <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+
+            <div>
+                <strong>${item.product.name}</strong>
+                <br>
+                <small>
+                    ${item.product.size} | ${item.product.color}
+                </small>
+            </div>
+
+            <div class="d-flex align-items-center gap-2">
+
+                <button
+                    class="btn btn-outline-secondary btn-sm"
+                    onclick="changePrintQty(${index}, -1)">
+                    −
+                </button>
+
+               <input
+                    type="number"
+                    class="form-control form-control-sm"
+                    style="width: 80px;"
+                    min="1"
+                    value="${item.qty}"
+                    onchange="changePrintQtyInput(${index}, this.value)">
+
+                <button
+                    class="btn btn-outline-secondary btn-sm"
+                    onclick="changePrintQty(${index}, 1)">
+                    +
+                </button>
+
+                <button
+                    class="btn btn-outline-danger btn-sm"
+                    onclick="removePrintQueue(${index})">
+                    🗑
+                </button>
+
+            </div>
+
+        </div>
+    `).join('');
+}//end
+
+//fungsi queue print
+function changePrintQty(index, change){
+
+    printQueue[index].qty += change;
+
+    if(printQueue[index].qty < 1){
+        printQueue[index].qty = 1;
+    }
+
+    renderPrintQueue();
+}//end
+
+//fungsi queue print
+function removePrintQueue(index){
+
+    printQueue.splice(index, 1);
+
+    renderPrintQueue();
+
+}//end
+
+function changePrintQtyInput(index, value){
+
+    let qty = parseInt(value);
+
+    if(!qty || qty < 1){
+        qty = 1;
+    }
+
+    printQueue[index].qty = qty;
+
+    renderPrintQueue();
+
+}//end
+
+function printAllQueue(){
+
+    if(printQueue.length === 0){
+        alert('Belum ada produk dalam daftar print.');
+        return;
+    }
+
+    let printWindow = window.open('', '_blank');
+
+    if(!printWindow){
+        alert('Popup diblokir oleh browser.');
+        return;
+    }
+
+    Promise.all(
+        printQueue.map(item =>
+            fetch(
+                '/qr/' +
+                encodeURIComponent(item.product.sku)
+            )
+            .then(res => res.text())
+            .then(svg => ({
+                product: item.product,
+                qty: item.qty,
+                svg: svg
+            }))
+        )
+    )
+    .then(results => {
+
+        //console.log(results);
+
+        let pages = '';
+        let items = [];
+
+        // Buat semua QR berdasarkan qty
+        results.forEach(item => {
+
+            for(let j = 0; j < item.qty; j++){
+
+                items.push(`
+                    <div class="qr-item">
+
+                        <div class="qr-name">
+                            ${item.product.name}
+                        </div>
+
+                        <div class="qr-detail">
+                            ${item.product.size} | ${item.product.color}
+                        </div>
+
+                        <div class="qr-code">
+                            ${item.svg}
+                        </div>
+
+                        <div class="qr-price">
+                            IDR. ${Number(item.product.price).toLocaleString('id-ID')}
+                        </div>
+
+                    </div>
+                `);
+
+            }
+
+        });
+
+        // Pecah menjadi maksimal 30 QR per A4
+        for(let i = 0; i < items.length; i += 30){
+
+            let pageItems =
+                items.slice(i, i + 30).join('');
+
+            pages += `
+                <div class="a4-page">
+                    ${pageItems}
+                </div>
+            `;
+
+        }
+
+        // Tulis ke window print SATU KALI
+        printWindow.document.write(`
+
+            <!DOCTYPE html>
+
+            <html>
+
+            <head>
+
+                <title>Print QR</title>
+
+                <style>
+
+                    * {
+                        box-sizing: border-box;
+                    }
+
+                    @page {
+                        size: A4 portrait;
+                        margin: 0;
+                    }
+
+                    html,
+                    body {
+                        margin: 0;
+                        padding: 0;
+                    }
+
+                    body {
+                        font-family: Arial, sans-serif;
+                    }
+
+                    .a4-page {
+
+                        width: 210mm;
+                        height: 297mm;
+
+                        padding: 10mm;
+
+                        display: grid;
+
+                        grid-template-columns:
+                            repeat(5, 1fr);
+
+                        grid-template-rows:
+                            repeat(6, 1fr);
+
+                        gap: 2mm;
+
+                        page-break-after: always;
+
+                    }
+
+                    .a4-page:last-child {
+                        page-break-after: auto;
+                    }
+
+                    .qr-item {
+
+                        display: flex;
+
+                        flex-direction: column;
+
+                        align-items: center;
+
+                        justify-content: center;
+
+                        text-align: center;
+
+                        overflow: hidden;
+
+                    }
+
+                    .qr-name {
+
+                        font-size: 10pt;
+
+                        font-weight: 600;
+
+                        margin-bottom: 2mm;
+
+                        max-width: 42mm;
+
+                        overflow: hidden;
+
+                        white-space: nowrap;
+
+                        text-overflow: ellipsis;
+
+                    }
+
+                    .qr-detail {
+
+                        font-size: 8pt;
+
+                        margin-bottom: 2mm;
+
+                        white-space: nowrap;
+
+                    }
+
+                    .qr-code {
+
+                        width: 20mm;
+
+                        height: 20mm;
+
+                        display: flex;
+
+                        align-items: center;
+
+                        justify-content: center;
+
+                    }
+
+                    .qr-code svg {
+
+                        width: 20mm;
+
+                        height: 20mm;
+
+                        display: block;
+
+                    }
+
+                    .qr-price {
+
+                        font-size: 8pt;
+
+                        font-weight: 600;
+
+                        margin-top: 2mm;
+
+                    }
+
+                </style>
+
+            </head>
+
+            <body>
+
+                ${pages}
+
+                <script>
+
+                    window.onload = function(){
+
+                       
+                        window.focus();
+                        window.print();
+
+                        setTimeout(function(){
+                            window.close();
+                        }, 500);
+
+                    };
+
+                <\/script>
+
+            </body>
+
+            </html>
+
+        `);
+
+        printWindow.document.close();
+                printQueue = [];
+        renderPrintQueue();
+
+        const queueModal =
+            bootstrap.Modal.getInstance(
+                document.getElementById('printQueueModal')
+            );
+
+        if(queueModal){
+            queueModal.hide();
+        }
+
+    })
+    .catch(error => {
+
+        printWindow.close();
+
+        console.error(error);
+
+        alert('Gagal mengambil QR.');
+
+    });
+
+}//end
 
 function openDeleteModal(id){
 
