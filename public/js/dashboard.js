@@ -47,7 +47,8 @@ function loadDashboard(){
                 </tr>
             `).join('');
         }
-
+        document.getElementById('lowStockCount').textContent =
+        `Menampilkan ${lowStock.data.length} dari ${lowStock.total} produk`;
 
         if(data.product_movement.length === 0){
             document.getElementById('productMovementEmpty').style.display='block';

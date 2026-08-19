@@ -80,6 +80,7 @@
 
             </table>
 
+            <small id="lowStockCount" class="text-muted"></small>
         </div>
 
         <!-- Charts -->
