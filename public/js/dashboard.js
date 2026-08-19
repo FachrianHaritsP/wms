@@ -94,8 +94,20 @@ function loadDashboard(){
             let stockIn = []
             let stockOut = []
 
-            data.stock_movement.forEach(item =>{
-                dates.push(item.date)
+            data.stock_movement.forEach(item => {
+
+                if (data.period === 'today') {
+
+                    dates.push(
+                        String(item.hour).padStart(2, '0') + ':00'
+                    )
+
+                } else {
+
+                    dates.push(item.date)
+
+                }
+
                 stockIn.push(item.total_in)
                 stockOut.push(item.total_out)
             })

@@ -18,6 +18,8 @@ class DashboardController extends Controller
             'success' => true,
             'message' => 'found',
 
+            'period' => $period,
+
             'kpi' => $this->getKPI($period),
 
             'low_stock' => $this->getLowStock(),
@@ -165,54 +167,89 @@ class DashboardController extends Controller
             ->get();
     }
 
-
     private function getStockMovement($period)
-    {
-        $query = StockTransaction::select(
+    { 
+        
+        if ($period == 'today') {
 
-            DB::raw('DATE(created_at) as date'),
+            $query = StockTransaction::select(
 
-            DB::raw(
-                'SUM(CASE WHEN type="in" THEN qty ELSE 0 END) as total_in'
-            ),
+                DB::raw("
+                    HOUR(
+                        CONVERT_TZ(created_at, '+00:00', '+07:00')
+                    ) as hour
+                "),
 
-            DB::raw(
-                'SUM(CASE WHEN type="out" THEN qty ELSE 0 END) as total_out'
+                DB::raw(
+                    'SUM(CASE WHEN type="in" THEN qty ELSE 0 END) as total_in'
+                ),
+
+                DB::raw(
+                    'SUM(CASE WHEN type="out" THEN qty ELSE 0 END) as total_out'
+                )
+
             )
-
-        );
-
-        if($period == 'today'){
-
-            $query->whereDate(
-                'created_at',
+            ->whereDate(
+                DB::raw("CONVERT_TZ(created_at, '+00:00', '+07:00')"),
                 today()
+            )
+            ->groupBy(
+                DB::raw("
+                    HOUR(
+                        CONVERT_TZ(created_at, '+00:00', '+07:00')
+                    )
+                ")
+            )
+            ->orderBy(
+                DB::raw("
+                    HOUR(
+                        CONVERT_TZ(created_at, '+00:00', '+07:00')
+                    )
+                "),
+                'asc'
             );
 
-        }elseif($period == 'week'){
+        } else {
 
-            $query->whereBetween(
-                'created_at',
-                [
-                    now()->startOfWeek(),
-                    now()->endOfWeek()
-                ]
+            $query = StockTransaction::select(
+
+                DB::raw('DATE(created_at) as date'),
+
+                DB::raw(
+                    'SUM(CASE WHEN type="in" THEN qty ELSE 0 END) as total_in'
+                ),
+
+                DB::raw(
+                    'SUM(CASE WHEN type="out" THEN qty ELSE 0 END) as total_out'
+                )
+
             );
 
-        }elseif($period == 'month'){
+            if ($period == 'week') {
 
-            $query->whereMonth(
-                'created_at',
-                now()->month
-            );
+                $query->whereBetween(
+                    'created_at',
+                    [
+                        now()->startOfWeek(),
+                        now()->endOfWeek()
+                    ]
+                );
 
+            } elseif ($period == 'month') {
+
+                $query->whereMonth(
+                    'created_at',
+                    now()->month
+                );
+            }
+
+            $query
+                ->groupBy('date')
+                ->orderBy('date', 'asc')
+                ->take(7);
         }
 
-        return $query
-            ->groupBy('date')
-            ->orderBy('date','desc')
-            ->take(7)
-            ->get();
+        return $query->get();
     }
 
     private function getDateFilter($query, $period)
