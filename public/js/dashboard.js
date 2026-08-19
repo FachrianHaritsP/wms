@@ -23,11 +23,12 @@ function loadDashboard(){
         document.getElementById('stock_in').innerText = data.kpi.stock_in
         document.getElementById('stock_out').innerText = data.kpi.stock_out
 
-        // Low stock table
-        let table = document.getElementById('low_stock_table')
+        //low stock
+        const lowStock = data.low_stock;
         const tbody = document.getElementById('low_stock_table');
 
-        if (data.low_stock.length === 0) {
+        if (lowStock.total === 0) {
+
             tbody.innerHTML = `
                 <tr>
                     <td colspan="3" class="text-center text-muted py-3">
@@ -35,11 +36,13 @@ function loadDashboard(){
                     </td>
                 </tr>
             `;
+
         } else {
-            tbody.innerHTML = data.low_stock.map(item => `
+
+            tbody.innerHTML = lowStock.data.map(item => `
                 <tr>
-                    <td>${item.sku}</td>
-                    <td>${item.name}</td>
+                    <td class="text-wrap">${item.sku}</td>
+                    <td class="text-wrap">${item.name}</td>
                     <td>${item.stock}</td>
                 </tr>
             `).join('');

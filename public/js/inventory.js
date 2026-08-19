@@ -73,7 +73,7 @@ function loadProducts(page = 1, search = ''){
                 </td>
 
                 <td class="text-nowrap">
-                    <div class="d-flex flex-nowrap gap-1">
+                    <div class="d-grid gap-2 d-md-block">
                         ${actionButtons}
                     </div>
                 </td>

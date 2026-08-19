@@ -65,7 +65,7 @@
 
         <h4>Stok Rendah</h4>
 
-            <table class="table table-bordered table-striped">
+            <table class="table table-bordered table-striped table-sm small">
 
             <thead class="table-danger">
             <tr>

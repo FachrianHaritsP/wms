@@ -102,9 +102,20 @@ class DashboardController extends Controller
 
     private function getLowStock()
     {
-        return Product::where('stock','<=',5)->get();
-    }
+        $query = Product::where('stock', '<=', 5);
 
+        $total = (clone $query)->count();
+
+        $products = $query
+            ->orderBy('stock', 'asc')
+            ->take(5)
+            ->get();
+
+        return [
+            'total' => $total,
+            'data' => $products
+        ];
+    }
 
     private function getProductMovement($period)
     {
