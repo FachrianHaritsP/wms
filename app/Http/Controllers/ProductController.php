@@ -45,6 +45,7 @@ class ProductController extends Controller
             'size' => 'required',
             'color' => 'required',
             'stock' => 'required|integer|min:0',
+            'price' => 'required|numeric|min:0',
             'rack_slot_id' => 'nullable|exists:rack_slots,id'
         ]);
 
@@ -54,6 +55,7 @@ class ProductController extends Controller
             'size' => $request->size,
             'color' => $request->color,
             'stock' => $request->stock,
+            'price' => $request->price,
             'rack_slot_id' => $request->rack_slot_id
         ]);
 
@@ -96,7 +98,8 @@ class ProductController extends Controller
             'name' => 'required',
             'size' => 'required',
             'color' => 'required',
-            'stock' => 'required|integer|min:0'
+            'stock' => 'required|integer|min:0',
+            'price' => 'required|numeric|min:0'
         ]);
 
         if(!$product){
@@ -113,6 +116,7 @@ class ProductController extends Controller
             'size' => $request->size,
             'color' => $request->color,
             'stock' => $request->stock,
+            'price' => $request->price,
             'rack_slot_id' => $request->rack_slot_id,
         ]);
 

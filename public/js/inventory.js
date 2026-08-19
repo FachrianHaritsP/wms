@@ -4,7 +4,7 @@ function loadProducts(page = 1, search = ''){
 
     let table = document.getElementById('product_table');
 
-    table.innerHTML ='<tr><td colspan="8" class="text-center">Loading...</td></tr>';
+    table.innerHTML ='<tr><td colspan="9" class="text-center">Loading...</td></tr>';
 
     fetch('/inventory/products?page=' + page + '&search=' + search)
 
@@ -67,6 +67,10 @@ function loadProducts(page = 1, search = ''){
                 </td>
 
                 <td class="d-none d-md-table-cell">
+                    IDR. ${Number(item.price).toLocaleString('id-ID')}
+                </td>
+
+                <td class="d-none d-md-table-cell">
                     ${item.rack_slot
                     ? item.rack_slot.rack.rack_code + '-' + item.rack_slot.slot_code
                     : '-'}
@@ -119,6 +123,7 @@ function openAddModal(){
     document.getElementById('size').value = ''
     document.getElementById('color').value = ''
     document.getElementById('stock').value = ''
+    document.getElementById('price').value = ''
     document.getElementById('rack_slot_id').value = ''
 
     new bootstrap.Modal(document.getElementById('productModal')).show()
@@ -133,6 +138,7 @@ function saveProduct(){
     let size = document.getElementById('size').value;
     let color = document.getElementById('color').value;
     let stock = document.getElementById('stock').value;
+    let price = document.getElementById('price').value;
     let rack_slot_id = document.getElementById('rack_slot_id').value;
 
     // VALIDASI
@@ -172,6 +178,7 @@ function saveProduct(){
         size: size,
         color: color,
         stock: stock,
+        price: price,
         rack_slot_id: rack_slot_id,
     };
 
@@ -259,6 +266,7 @@ function openEditModal(id){
         document.getElementById('size').value = data.size
         document.getElementById('color').value = data.color
         document.getElementById('stock').value = data.stock
+        document.getElementById('price').value = data.price
         document.getElementById('rack_slot_id').value = data.rack_slot_id,
 
         new bootstrap.Modal(document.getElementById('productModal')).show()
@@ -297,6 +305,10 @@ function openInfoModal(id){
 
         document.getElementById('info_stock')
             .innerText = data.stock;
+
+        document.getElementById('info_price')
+            .innerText =
+            'IDR. ' + Number(data.price).toLocaleString('id-ID');
 
         document.getElementById('info_location')
             .innerText =
@@ -351,6 +363,11 @@ function openPrintModal(){
     document.getElementById(
         'print_product_name'
     ).innerText = printProduct.name;
+
+    document.getElementById(
+    'print_product_price'
+    ).innerText =
+        'IDR. ' + Number(printProduct.price).toLocaleString('id-ID');
 
     document.getElementById(
         'print_qty'
@@ -433,6 +450,10 @@ function printQR(){
 
                         <div class="qr-code">
                             ${svg}
+                        </div>
+
+                        <div class="qr-price">
+                            IDR. ${Number(printProduct.price).toLocaleString('id-ID')}
                         </div>
 
                     </div>
@@ -569,6 +590,15 @@ function printQR(){
                         display: block;
 
                     }
+
+                    .qr-price {
+                        font-size: 8pt;
+                        font-weight: 600;
+                        margin-top: 2mm;
+                        white-space: nowrap;
+                    }
+                    
+                    
 
                 </style>
 

@@ -23,6 +23,7 @@
                     <th class="d-none d-md-table-cell">Ukuran</th>
                     <th class="d-none d-md-table-cell">Warna</th>
                     <th>Stock</th>
+                    <th class="d-none d-md-table-cell">Harga</th>
                     <th class="d-none d-md-table-cell">Lokasi</th>
                     <th>Aksi</th>
                 </tr>
@@ -73,6 +74,19 @@
                 <div class="mb-2">
                     Stock
                     <input type="number" id="stock" class="form-control" placeholder="Stock">
+                </div>
+
+                <div class="mb-3">
+                <label for="price" class="form-label">Harga</label>
+                    <input
+                        type="number"
+                        id="price"
+                        name="price"
+                        class="form-control"
+                        min="0"
+                        step="1"
+                        placeholder="340000"
+                    >
                 </div>
 
                 <div class="mb-3">
@@ -179,11 +193,14 @@
                     </p>
 
                     <p>
+                        <b>Harga:</b>
+                        <span id="info_price"></span>  
+                    </p>
+
+                    <p>
                         <b>Lokasi:</b>
                         <span id="info_location"></span>
                     </p>
-
-                  
 
                     <hr>
 
@@ -235,6 +252,11 @@
                     <p>
                         <b>Produk:</b>
                         <span id="print_product_name"></span>
+                    </p>
+
+                    <p>
+                        <b>Harga:</b>
+                        <span id="print_product_price"></span>
                     </p>
 
                     <div class="mb-3">

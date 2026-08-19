@@ -13,6 +13,7 @@ class Product extends Model
     'size',
     'color',
     'stock',
+    'price',
     'rack_slot_id',
     ];
 
