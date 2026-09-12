@@ -584,16 +584,16 @@ function printQR(){
 
                     .qr-code svg {
 
-                        width: 20mm;
+                        width: 14mm;
 
-                        height: 20mm;
+                        height: 14mm;
 
                         display: block;
 
                     }
 
                     .qr-price {
-                        font-size: 8pt;
+                        font-size: 12pt;
                         font-weight: 600;
                         margin-top: 2mm;
                         white-space: nowrap;
@@ -961,9 +961,9 @@ function printAllQueue(){
 
                     .qr-code {
 
-                        width: 20mm;
+                        width: 14mm;
 
-                        height: 20mm;
+                        height: 14mm;
 
                         display: flex;
 
@@ -975,9 +975,9 @@ function printAllQueue(){
 
                     .qr-code svg {
 
-                        width: 20mm;
+                        width: 14mm;
 
-                        height: 20mm;
+                        height: 14mm;
 
                         display: block;
 
@@ -985,11 +985,13 @@ function printAllQueue(){
 
                     .qr-price {
 
-                        font-size: 8pt;
+                        font-size: 12pt;
 
                         font-weight: 600;
 
                         margin-top: 2mm;
+
+                        line-height: 1;
 
                     }
 
