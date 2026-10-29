@@ -7,6 +7,7 @@ use App\Models\Rack;
 use App\Models\RackSlot;
 use App\Models\StockTransaction;
 use App\Models\User;
+use App\Models\StockBatch;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -468,6 +469,25 @@ class DatabaseSeeder extends Seeder
             Product::create($data);
         }
 
+        /*
+        |--------------------------------------------------------------------------
+        | STOCK BATCHES
+        |--------------------------------------------------------------------------
+        */
+
+        $product = Product::where('sku', 'T006HOUAB260001')->first();
+
+        StockBatch::create([
+            'product_id' => $product->id,
+            'quantity' => 2,
+            'remaining_quantity' => 2,
+        ]);
+
+        StockBatch::create([
+            'product_id' => $product->id,
+            'quantity' => 3,
+            'remaining_quantity' => 3,
+        ]);
 
         /*
         |--------------------------------------------------------------------------
